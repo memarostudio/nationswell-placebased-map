@@ -21,6 +21,8 @@ if (containerElement) {
 
 function Map() {
   const [usGeoData, setUsGeoData] = useState(null);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
 
   // fetch US Geo data
   useEffect(() => {
@@ -49,31 +51,62 @@ function Map() {
   const width = 975;
   const height = 610;
 
-  // Use pre-rendered PNG instead of processing GeoTIFF on every load
-  return html`<div class="inner-map">
-    <svg class="map-svg" viewBox="0 0 ${width} ${height}">
-      ${statesArray.map((state) => {
-        return html`<path d=${state.path} fill=${state.fillColor} />`;
-      })}
-    </svg>
-    <img
-      src="./data/population-density-layer.png"
-      class="map-overlay"
-      alt="Population density overlay"
-      width="${width}"
-      height="${height}"
-    />
+  const ZOOM_STEP = 0.3;
+  const MIN_ZOOM = 1;
+  const MAX_ZOOM = 5;
 
-    <svg class="map-svg" viewBox="0 0 ${width} ${height}">
-      ${statesArray.map((state) => {
-        return html`<path
-          d=${state.path}
-          fill="none"
-          stroke="var(--color-palette--blue)"
-          stroke-width="1.5"
-        />`;
-      })}
-    </svg>
+  function handleZoomIn() {
+    setZoom((prevZoom) => Math.min(prevZoom + ZOOM_STEP, MAX_ZOOM));
+  }
+
+  function handleZoomOut() {
+    setZoom((prevZoom) => {
+      const newZoom = Math.max(prevZoom - ZOOM_STEP, MIN_ZOOM);
+      // Reset pan when zooming out to minimum
+      if (newZoom === MIN_ZOOM) {
+        setPan({ x: 0, y: 0 });
+      }
+      return newZoom;
+    });
+  }
+
+  // Calculate transform style for zoom and pan
+  const transformStyle = {
+    transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+    transformOrigin: "center center",
+    transition: "transform 0.3s ease-out",
+  };
+
+  return html`<div class="inner-map">
+    <div class="map-content" style=${transformStyle}>
+      <svg class="map-svg" viewBox="0 0 ${width} ${height}">
+        ${statesArray.map((state) => {
+          return html`<path d=${state.path} fill=${state.fillColor} />`;
+        })}
+      </svg>
+      <img
+        src="./data/population-density-layer.png"
+        class="map-overlay"
+        alt="Population density overlay"
+        width="${width}"
+        height="${height}"
+      />
+
+      <svg class="map-svg" viewBox="0 0 ${width} ${height}">
+        ${statesArray.map((state) => {
+          return html`<path
+            d=${state.path}
+            fill="none"
+            stroke="var(--color-palette--blue)"
+            stroke-width="1.5"
+          />`;
+        })}
+      </svg>
+    </div>
+    <div class="map-buttons">
+      <button class="map-button" onClick=${handleZoomIn}>+</button>
+      <button class="map-button" onClick=${handleZoomOut}>-</button>
+    </div>
   </div>`;
 }
 
