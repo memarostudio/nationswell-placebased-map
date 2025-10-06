@@ -96,17 +96,31 @@ function Map() {
     console.log("GeoTIFF bbox:", georaster.bbox);
     console.log("GeoTIFF dimensions:", georaster.width, "x", georaster.height);
 
-    // Find min/max values for normalization
+    // Find min/max values for normalization using logarithmic scale
     let minVal = Infinity;
     let maxVal = -Infinity;
+    const values = [];
+
     for (let i = 0; i < georaster.data.length; i++) {
       const val = georaster.data[i];
       if (val > 0) {
         minVal = Math.min(minVal, val);
         maxVal = Math.max(maxVal, val);
+        values.push(val);
       }
     }
+
+    // Calculate percentiles for better color distribution
+    values.sort((a, b) => a - b);
+    const p50 = values[Math.floor(values.length * 0.5)];
+    const p95 = values[Math.floor(values.length * 0.95)];
+
     console.log("GeoTIFF value range:", minVal, "to", maxVal);
+    console.log("GeoTIFF median (p50):", p50, "95th percentile:", p95);
+
+    // Use logarithmic scale for better distribution
+    const logMin = Math.log(minVal + 1);
+    const logMax = Math.log(maxVal + 1);
 
     // Create inverse projection (screen -> geo)
     const projectionInverse = projection.invert;
@@ -144,23 +158,35 @@ function Map() {
 
         if (value <= 0) continue; // Skip nodata
 
-        // Normalize value
+        // Normalize value using logarithmic scale for better distribution
+        const logValue = Math.log(value + 1);
         const normalized = Math.min(
           1,
-          Math.max(0, (value - minVal) / (maxVal - minVal))
+          Math.max(0, (logValue - logMin) / (logMax - logMin))
         );
 
         const pixelIdx = (py * width + px) * 4;
 
-        // Color scheme: blue to red gradient
-        const r = Math.floor(normalized * 255);
-        const g = Math.floor((1 - normalized) * 100);
-        const b = Math.floor((1 - normalized) * 255);
+        // Color scheme: blue (low) to yellow to red (high) gradient
+        let r, g, b;
+        if (normalized < 0.5) {
+          // Blue to yellow
+          const t = normalized * 2;
+          r = Math.floor(t * 255);
+          g = Math.floor(t * 255);
+          b = Math.floor((1 - t) * 255);
+        } else {
+          // Yellow to red
+          const t = (normalized - 0.5) * 2;
+          r = 255;
+          g = Math.floor((1 - t) * 255);
+          b = 0;
+        }
 
         pixels[pixelIdx] = r; // Red
         pixels[pixelIdx + 1] = g; // Green
         pixels[pixelIdx + 2] = b; // Blue
-        pixels[pixelIdx + 3] = 200; // Alpha
+        pixels[pixelIdx + 3] = 180; // Alpha (slightly more transparent)
 
         renderedPixels++;
       }
@@ -187,7 +213,6 @@ function Map() {
   });
 
   return html`<div class="inner-map">
-    <canvas ref=${canvasRef} class="map-canvas"></canvas>
     <svg class="map-svg" viewBox="0 0 ${width} ${height}">
       ${statesArray.map((state) => {
         return html`<path
@@ -198,6 +223,7 @@ function Map() {
         />`;
       })}
     </svg>
+    <canvas ref=${canvasRef} class="map-canvas"></canvas>
   </div>`;
 }
 
