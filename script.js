@@ -35,6 +35,9 @@ function Map() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const mapContainerRef = useRef(null);
+  const [showMarkerDetails, setShowMarkerDetails] = useState(false);
+  const [markerDetails, setMarkerDetails] = useState(null);
+  const [showOverlay, setShowOverlay] = useState(false);
 
   // fetch US Geo data
   useEffect(() => {
@@ -63,16 +66,13 @@ function Map() {
   const width = 975;
   const height = 610;
 
-  // Example marker - you can add more or make this dynamic
   const markers = [
     { lat: 40.7128, lon: -74.006, label: "New York City" }, // NYC
-    // Add more markers here as needed
   ];
 
   // Convert lat/lon to screen coordinates
   function latLonToScreen(lat, lon) {
-    const coords = projection([lon, lat]);
-    return coords;
+    return projection([lon, lat]);
   }
 
   const ZOOM_STEP = 0.3;
@@ -206,8 +206,21 @@ function Map() {
     cursor: isDragging ? "grabbing" : "grab",
   };
 
-  function handleMarkerClick(marker) {
-    alert(`Marker clicked: ${marker.label}`);
+  function handleMarkerClick(event, marker) {
+    setShowMarkerDetails(true);
+
+    setMarkerDetails({ ...marker, x: event.clientX, y: event.clientY });
+  }
+
+  function viewProjectDetails(marker) {
+    console.log(`Viewing details for marker: ${marker.label}`);
+    setShowOverlay(true);
+  }
+
+  function handleCloseDetails() {
+    setShowMarkerDetails(false);
+    setMarkerDetails(null);
+    setShowOverlay(false);
   }
 
   return html`<div class="inner-map" ref=${mapContainerRef}>
@@ -250,12 +263,13 @@ function Map() {
         <g class="markers-layer">
           ${markers.map((marker) => {
             const coords = latLonToScreen(marker.lat, marker.lon);
+            console.log("Marker coords for", marker.label, ":", coords);
             if (!coords) return null; // Skip if outside projection bounds
 
             const [x, y] = coords;
             return html`<g
               class="marker"
-              onclick=${() => handleMarkerClick(marker)}
+              onclick=${(event) => handleMarkerClick(event, marker)}
             >
               <g class="marker-default">
                 <circle cx=${x} cy=${y} r="${24 / 2}" fill="white" />
@@ -276,11 +290,36 @@ function Map() {
           })}
         </g>
       </svg>
+      ${showMarkerDetails &&
+      html`<div
+        className="marker-details"
+        style="top: ${markerDetails
+          ? markerDetails.y
+          : 0}px; left: ${markerDetails ? markerDetails.x : 0}px;"
+      >
+        <p>Marker Details</p>
+        <button onclick=${() => viewProjectDetails(markerDetails)}>
+          View project details
+        </button>
+      </div>`}
     </div>
     <div class="map-buttons">
       <button class="map-button" onClick=${handleZoomIn}>+</button>
       <button class="map-button" onClick=${handleZoomOut}>-</button>
     </div>
+    ${showOverlay &&
+    html`<div class="map-details-overlay">
+      <div class="map-details-content">
+        <img
+          class="close-icon"
+          src="https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main/data/close.svg"
+          alt="Close map details overlay"
+          onclick=${handleCloseDetails}
+        />
+        <p>details view</p>
+      </div>
+      <div class="map-details-background"></div>
+    </div>`}
   </div>`;
 }
 
