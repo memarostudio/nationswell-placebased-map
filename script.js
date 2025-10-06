@@ -195,6 +195,17 @@ function Map() {
     console.log("Canvas pixels rendered:", renderedPixels);
 
     ctx.putImageData(imageData, 0, 0);
+
+    // Additional debug: verify canvas has content
+    const testPixel = ctx.getImageData(0, 0, 1, 1);
+    console.log("Canvas first pixel RGBA:", testPixel.data);
+    console.log("Canvas element dimensions:", canvas.width, "x", canvas.height);
+    console.log(
+      "Canvas display size:",
+      canvas.offsetWidth,
+      "x",
+      canvas.offsetHeight
+    );
   }, [georaster]);
 
   if (!usGeoData) {
