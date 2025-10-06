@@ -23,6 +23,8 @@ function Map() {
   const [usGeoData, setUsGeoData] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   // fetch US Geo data
   useEffect(() => {
@@ -70,15 +72,96 @@ function Map() {
     });
   }
 
+  // Panning handlers
+  function handleMouseDown(e) {
+    setIsDragging(true);
+    setDragStart({
+      x: e.clientX - pan.x,
+      y: e.clientY - pan.y,
+    });
+  }
+
+  function handleMouseMove(e) {
+    if (isDragging) {
+      setPan({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    }
+  }
+
+  function handleMouseUp() {
+    setIsDragging(false);
+  }
+
+  // Touch handlers for mobile
+  function handleTouchStart(e) {
+    if (e.touches.length === 1) {
+      setIsDragging(true);
+      setDragStart({
+        x: e.touches[0].clientX - pan.x,
+        y: e.touches[0].clientY - pan.y,
+      });
+    }
+  }
+
+  function handleTouchMove(e) {
+    if (isDragging && e.touches.length === 1) {
+      e.preventDefault();
+      setPan({
+        x: e.touches[0].clientX - dragStart.x,
+        y: e.touches[0].clientY - dragStart.y,
+      });
+    }
+  }
+
+  function handleTouchEnd() {
+    setIsDragging(false);
+  }
+
+  // Mouse wheel zoom
+  function handleWheel(e) {
+    e.preventDefault();
+
+    const delta = e.deltaY * -0.01; // Normalize scroll direction
+    const zoomChange = delta * 0.5; // Smaller steps for smoother zoom
+
+    setZoom((prevZoom) => {
+      const newZoom = Math.min(
+        Math.max(prevZoom + zoomChange, MIN_ZOOM),
+        MAX_ZOOM
+      );
+
+      // Reset pan when zooming out to minimum
+      if (newZoom === MIN_ZOOM) {
+        setPan({ x: 0, y: 0 });
+      }
+
+      return newZoom;
+    });
+  }
+
   // Calculate transform style for zoom and pan
   const transformStyle = {
     transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
     transformOrigin: "center center",
-    transition: "transform 0.3s ease-out",
+    transition: isDragging ? "none" : "transform 0.3s ease-out",
+    cursor: isDragging ? "grabbing" : "grab",
   };
 
   return html`<div class="inner-map">
-    <div class="map-content" style=${transformStyle}>
+    <div
+      class="map-content"
+      style=${transformStyle}
+      onMouseDown=${handleMouseDown}
+      onMouseMove=${handleMouseMove}
+      onMouseUp=${handleMouseUp}
+      onMouseLeave=${handleMouseUp}
+      onTouchStart=${handleTouchStart}
+      onTouchMove=${handleTouchMove}
+      onTouchEnd=${handleTouchEnd}
+      onWheel=${handleWheel}
+    >
       <svg class="map-svg" viewBox="0 0 ${width} ${height}">
         ${statesArray.map((state) => {
           return html`<path d=${state.path} fill=${state.fillColor} />`;
