@@ -210,7 +210,7 @@ function Map() {
         })}
       </svg>
       <img
-        src="./data/population-density-layer_adjusted1.png"
+        src="https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main/data/population-density-layer_adjusted1.png"
         class="map-overlay"
         alt="Population density overlay"
         width="${width}"
