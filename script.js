@@ -10,6 +10,9 @@ import {
 // So we use identity projection for the SVG paths
 const geoPath = d3.geoPath();
 
+// For converting lat/long to screen coordinates, we need the projection
+const projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
+
 console.log("Script for place-based map loaded.");
 
 const containerElement = document.getElementById("map");
@@ -59,6 +62,18 @@ function Map() {
 
   const width = 975;
   const height = 610;
+
+  // Example marker - you can add more or make this dynamic
+  const markers = [
+    { lat: 40.7128, lon: -74.006, label: "New York City" }, // NYC
+    // Add more markers here as needed
+  ];
+
+  // Convert lat/lon to screen coordinates
+  function latLonToScreen(lat, lon) {
+    const coords = projection([lon, lat]);
+    return coords;
+  }
 
   const ZOOM_STEP = 0.3;
   const MIN_ZOOM = 1;
@@ -191,6 +206,10 @@ function Map() {
     cursor: isDragging ? "grabbing" : "grab",
   };
 
+  function handleMarkerClick(marker) {
+    alert(`Marker clicked: ${marker.label}`);
+  }
+
   return html`<div class="inner-map" ref=${mapContainerRef}>
     <div
       class="map-content"
@@ -218,14 +237,44 @@ function Map() {
       />
 
       <svg class="map-svg" viewBox="0 0 ${width} ${height}">
-        ${statesArray.map((state) => {
-          return html`<path
-            d=${state.path}
-            fill="none"
-            stroke="var(--color-palette--blue)"
-            stroke-width="1.5"
-          />`;
-        })}
+        <g class="states-layer">
+          ${statesArray.map((state) => {
+            return html`<path
+              d=${state.path}
+              fill="none"
+              stroke="var(--color-palette--blue)"
+              stroke-width="1.5"
+            />`;
+          })}
+        </g>
+        <g class="markers-layer">
+          ${markers.map((marker) => {
+            const coords = latLonToScreen(marker.lat, marker.lon);
+            if (!coords) return null; // Skip if outside projection bounds
+
+            const [x, y] = coords;
+            return html`<g
+              class="marker"
+              onclick=${() => handleMarkerClick(marker)}
+            >
+              <g class="marker-default">
+                <circle cx=${x} cy=${y} r="${24 / 2}" fill="white" />
+              </g>
+
+              <g class="marker-hovered">
+                <circle
+                  cx=${x}
+                  cy=${y}
+                  r="${66 / 2}"
+                  fill="#061A6199"
+                  stroke="#061A61"
+                  stroke-width="2"
+                />
+                <circle cx=${x} cy=${y} r="${14 / 2}" fill="white" />
+              </g>
+            </g>`;
+          })}
+        </g>
       </svg>
     </div>
     <div class="map-buttons">
