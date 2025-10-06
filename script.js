@@ -1,4 +1,10 @@
-import { html, renderComponent, useEffect, useState } from "./js/preact-htm.js";
+import {
+  html,
+  renderComponent,
+  useEffect,
+  useState,
+  useRef,
+} from "./js/preact-htm.js";
 
 // The TopoJSON is already pre-projected to pixel coordinates (Albers USA)
 // So we use identity projection for the SVG paths
@@ -25,6 +31,7 @@ function Map() {
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const mapContainerRef = useRef(null);
 
   // fetch US Geo data
   useEffect(() => {
@@ -57,19 +64,57 @@ function Map() {
   const MIN_ZOOM = 1;
   const MAX_ZOOM = 5;
 
+  // Helper function to zoom toward a specific point
+  function zoomToPoint(newZoom, clientX, clientY) {
+    if (!mapContainerRef.current) return;
+
+    const rect = mapContainerRef.current.getBoundingClientRect();
+
+    // Get mouse position relative to container center
+    const mouseX = clientX - rect.left - rect.width / 2;
+    const mouseY = clientY - rect.top - rect.height / 2;
+
+    // Calculate the point in the map space before zoom
+    const pointX = (mouseX - pan.x) / zoom;
+    const pointY = (mouseY - pan.y) / zoom;
+
+    // Calculate new pan to keep the point under the cursor
+    const newPan = {
+      x: mouseX - pointX * newZoom,
+      y: mouseY - pointY * newZoom,
+    };
+
+    setPan(newPan);
+    setZoom(newZoom);
+  }
+
+  // Zoom to current center (for buttons)
+  function zoomToCenter(newZoom) {
+    // Keep the current center point fixed when zooming with buttons
+    // This means we adjust pan proportionally to the zoom change
+    const zoomRatio = newZoom / zoom;
+    setPan({
+      x: pan.x * zoomRatio,
+      y: pan.y * zoomRatio,
+    });
+    setZoom(newZoom);
+  }
+
   function handleZoomIn() {
-    setZoom((prevZoom) => Math.min(prevZoom + ZOOM_STEP, MAX_ZOOM));
+    const newZoom = Math.min(zoom + ZOOM_STEP, MAX_ZOOM);
+    zoomToCenter(newZoom);
   }
 
   function handleZoomOut() {
-    setZoom((prevZoom) => {
-      const newZoom = Math.max(prevZoom - ZOOM_STEP, MIN_ZOOM);
-      // Reset pan when zooming out to minimum
-      if (newZoom === MIN_ZOOM) {
-        setPan({ x: 0, y: 0 });
-      }
-      return newZoom;
-    });
+    const newZoom = Math.max(zoom - ZOOM_STEP, MIN_ZOOM);
+
+    // Reset pan when zooming out to minimum
+    if (newZoom === MIN_ZOOM) {
+      setPan({ x: 0, y: 0 });
+      setZoom(newZoom);
+    } else {
+      zoomToCenter(newZoom);
+    }
   }
 
   // Panning handlers
@@ -126,19 +171,16 @@ function Map() {
     const delta = e.deltaY * -0.01; // Normalize scroll direction
     const zoomChange = delta * 0.5; // Smaller steps for smoother zoom
 
-    setZoom((prevZoom) => {
-      const newZoom = Math.min(
-        Math.max(prevZoom + zoomChange, MIN_ZOOM),
-        MAX_ZOOM
-      );
+    const newZoom = Math.min(Math.max(zoom + zoomChange, MIN_ZOOM), MAX_ZOOM);
 
-      // Reset pan when zooming out to minimum
-      if (newZoom === MIN_ZOOM) {
-        setPan({ x: 0, y: 0 });
-      }
-
-      return newZoom;
-    });
+    // Reset pan when zooming out to minimum
+    if (newZoom === MIN_ZOOM) {
+      setPan({ x: 0, y: 0 });
+      setZoom(newZoom);
+    } else {
+      // Zoom to cursor position
+      zoomToPoint(newZoom, e.clientX, e.clientY);
+    }
   }
 
   // Calculate transform style for zoom and pan
@@ -149,7 +191,7 @@ function Map() {
     cursor: isDragging ? "grabbing" : "grab",
   };
 
-  return html`<div class="inner-map">
+  return html`<div class="inner-map" ref=${mapContainerRef}>
     <div
       class="map-content"
       style=${transformStyle}
@@ -168,7 +210,7 @@ function Map() {
         })}
       </svg>
       <img
-        src="./data/population-density-layer.png"
+        src="./data/population-density-layer_adjusted1.png"
         class="map-overlay"
         alt="Population density overlay"
         width="${width}"
