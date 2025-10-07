@@ -100,16 +100,16 @@
     max-width: 80%;
     max-height: 80%;
     overflow: auto;
-
-    .close-icon {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 24px;
-      height: 24px;
-      cursor: pointer;
-    }
   }
+}
+
+.close-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
 }
 
 .map-buttons {

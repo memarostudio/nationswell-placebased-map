@@ -27,6 +27,9 @@ export function Map({ usGeoData, places }) {
   if (!usGeoData) {
     return html`<div>Loading US Geo data...</div>`;
   }
+  if (!places) {
+    return html`<div>Loading Places data...</div>`;
+  }
 
   const states = topojson.feature(usGeoData, usGeoData.objects.states).features;
 
@@ -187,10 +190,15 @@ export function Map({ usGeoData, places }) {
     setOverlayPlaceId(placeId);
   }
 
-  function handleCloseDetails() {
+  function handleCloseOverlay() {
     setShowMarkerDetails(false);
     setMarkerDetails(null);
     setShowOverlay(false);
+  }
+
+  function handleCloseDetails() {
+    setShowMarkerDetails(false);
+    setMarkerDetails(null);
   }
 
   return html`<div class="inner-map" ref=${mapContainerRef}>
@@ -249,6 +257,7 @@ export function Map({ usGeoData, places }) {
       html`<${MarkerDetails}
         markerDetails=${markerDetails}
         viewProjectDetails=${viewProjectDetails}
+        handleCloseDetails=${handleCloseDetails}
       />`}
     </div>
     <div class="map-buttons">
@@ -258,7 +267,7 @@ export function Map({ usGeoData, places }) {
     ${showOverlay &&
     html`<${Overlay}
       place=${places.filter((p) => p.id === overlayPlaceId)[0]}
-      handleCloseDetails=${handleCloseDetails}
+      handleCloseOverlay=${handleCloseOverlay}
     />`}
   </div>`;
 }

@@ -33,16 +33,22 @@ function Content() {
       .then(setUsGeoData);
 
     d3.csv(
-      "https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main/data/places.csv"
+      "https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main/data/places_with_id.csv"
       //"./data/places.csv"
     ).then((data) => {
       // preprocess data as needed
       data.forEach((d) => {
+        d["id"] = +d["Id"];
         d["lat"] = +d["Latitude"];
         d["lon"] = +d["Longitude"];
         d["gini"] = +d["Gini Coefficient"];
         d["name"] = d["Project Name"];
-        d["id"] = +d["Id"];
+        d["startYear"] = d["Start Year"];
+        d["endYear"] = d["End Year"];
+        d["previewDescription"] = d["Project Preview Description"];
+        d["description"] = d["Project Description"];
+        d["city"] = d["City"];
+        d["state"] = d["State"];
       });
       data = data.filter((p) => p["name"] !== "");
       setPlacesData(data);
