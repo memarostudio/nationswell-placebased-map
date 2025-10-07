@@ -29,7 +29,10 @@ export function MarkerDetails({
       />
     </svg>
     <p>${markerDetails.name}</p>
-    <button onclick=${() => viewProjectDetails(markerDetails.id)}>
+    <button
+      onclick=${() => viewProjectDetails(markerDetails.id)}
+      class="bg-vis-main-blue text-white"
+    >
       View project details
     </button>
   </div>`;

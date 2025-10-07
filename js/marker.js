@@ -4,7 +4,7 @@ export function Marker({ marker, handleMarkerClick, x, y }) {
   return html`
     <g class="marker" onclick=${(event) => handleMarkerClick(event, marker)}>
       <g class="marker-default">
-        <circle cx=${x} cy=${y} r="${24 / 2}" fill="white" />
+        <circle cx=${x} cy=${y} r="${24 / 2}" class="fill-white" />
       </g>
 
       <g class="marker-hovered">
@@ -16,7 +16,7 @@ export function Marker({ marker, handleMarkerClick, x, y }) {
           stroke="#061A61"
           stroke-width="2"
         />
-        <circle cx=${x} cy=${y} r="${14 / 2}" fill="white" />
+        <circle cx=${x} cy=${y} r="${14 / 2}" class="fill-white" />
       </g>
     </g>
   `;
