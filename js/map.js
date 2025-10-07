@@ -4,17 +4,25 @@ import { Marker } from "./marker.js";
 import { Overlay } from "./overlay.js";
 import { MarkerDetails } from "./markerDetails.js";
 
-export function Map({ usGeoData }) {
-  console.log("Rendering Map with usGeoData:", usGeoData);
+export function Map({ usGeoData, places }) {
+  console.log(
+    "Rendering Map with usGeoData:",
+    usGeoData,
+    "and placesData:",
+    places
+  );
 
+  // map state
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const mapContainerRef = useRef(null);
+
   const [showMarkerDetails, setShowMarkerDetails] = useState(false);
   const [markerDetails, setMarkerDetails] = useState(null);
   const [showOverlay, setShowOverlay] = useState(false);
+  const [overlayPlaceId, setOverlayPlaceId] = useState(null);
 
   if (!usGeoData) {
     return html`<div>Loading US Geo data...</div>`;
@@ -173,9 +181,10 @@ export function Map({ usGeoData }) {
     setMarkerDetails({ ...marker, x: event.clientX, y: event.clientY });
   }
 
-  function viewProjectDetails(marker) {
-    console.log(`Viewing details for marker: ${marker.label}`);
+  function viewProjectDetails(placeId) {
+    console.log(`Viewing details for marker with id ${placeId}`);
     setShowOverlay(true);
+    setOverlayPlaceId(placeId);
   }
 
   function handleCloseDetails() {
@@ -222,10 +231,9 @@ export function Map({ usGeoData }) {
           })}
         </g>
         <g class="markers-layer">
-          ${markers.map((marker) => {
+          ${places.map((marker) => {
             const coords = latLonToScreen(marker.lat, marker.lon);
-            console.log("Marker coords for", marker.label, ":", coords);
-            if (!coords) return null; // Skip if outside projection bounds
+            if (!coords) return null; // Skip if outside projection bounds or undefined
 
             const [x, y] = coords;
             return html`<${Marker}
@@ -248,6 +256,9 @@ export function Map({ usGeoData }) {
       <button class="map-button" onClick=${handleZoomOut}>-</button>
     </div>
     ${showOverlay &&
-    html`<${Overlay} handleCloseDetails=${handleCloseDetails} />`}
+    html`<${Overlay}
+      place=${places.filter((p) => p.id === overlayPlaceId)[0]}
+      handleCloseDetails=${handleCloseDetails}
+    />`}
   </div>`;
 }

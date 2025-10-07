@@ -22,6 +22,7 @@ function renderContent() {
 
 function Content() {
   const [usGeoData, setUsGeoData] = useState(null);
+  const [placesData, setPlacesData] = useState(null);
 
   // load data
   useEffect(() => {
@@ -30,9 +31,27 @@ function Content() {
     )
       .then((res) => res.json())
       .then(setUsGeoData);
+
+    d3.csv(
+      // "https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main/data/states-albers-10m.json"
+      "./data/places.csv"
+    ).then((data) => {
+      // preprocess data as needed
+      data.forEach((d) => {
+        d["lat"] = +d["Latitude"];
+        d["lon"] = +d["Longitude"];
+        d["gini"] = +d["Gini Coefficient"];
+        d["name"] = d["Project Name"];
+        d["id"] = +d["Id"];
+      });
+      data = data.filter((p) => p["name"] !== "");
+      setPlacesData(data);
+    });
   }, []);
 
   return html`
-    ${usGeoData ? html`<${Map} usGeoData=${usGeoData} />` : "Loading..."}
+    ${usGeoData
+      ? html`<${Map} usGeoData=${usGeoData} places=${placesData} />`
+      : "Loading..."}
   `;
 }

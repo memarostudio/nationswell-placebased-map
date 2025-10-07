@@ -7,8 +7,8 @@ export function MarkerDetails({ markerDetails, viewProjectDetails }) {
       ? markerDetails.x
       : 0}px;"
   >
-    <p>Marker Details</p>
-    <button onclick=${() => viewProjectDetails(markerDetails)}>
+    <p>${markerDetails.name}</p>
+    <button onclick=${() => viewProjectDetails(markerDetails.id)}>
       View project details
     </button>
   </div>`;

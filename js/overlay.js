@@ -1,6 +1,9 @@
 import { html } from "./preact-htm.js";
 
-export function Overlay({ handleCloseDetails }) {
+export function Overlay({ place, handleCloseDetails }) {
+  if (!place) {
+    return null;
+  }
   return html`<div class="map-details-overlay">
     <div class="map-details-content">
       <img
@@ -9,7 +12,7 @@ export function Overlay({ handleCloseDetails }) {
         alt="Close map details overlay"
         onclick=${handleCloseDetails}
       />
-      <p>details view</p>
+      <p>details view of ${place.name}</p>
     </div>
     <div class="map-details-background"></div>
   </div>`;
