@@ -201,9 +201,13 @@ export function Map({ usGeoData, places }) {
     setMarkerDetails(null);
   }
 
-  return html`<div class="inner-map" ref=${mapContainerRef}>
+  return html`<div
+    class="inner-map"
+    ref=${mapContainerRef}
+    class="position-relative w-full h-full overflow-hidden"
+  >
     <div
-      class="map-content"
+      class="map-content relative w-full h-full select-none touch-none"
       style=${transformStyle}
       onMouseDown=${handleMouseDown}
       onMouseMove=${handleMouseMove}
@@ -214,20 +218,27 @@ export function Map({ usGeoData, places }) {
       onTouchEnd=${handleTouchEnd}
       onWheel=${handleWheel}
     >
-      <svg class="map-svg" viewBox="0 0 ${width} ${height}">
+      <svg
+        class="map-svg absolute top-0 left-0 w-full h-full object-contain block"
+        viewBox="0 0 ${width} ${height}"
+      >
         ${statesArray.map((state) => {
           return html`<path d=${state.path} fill=${state.fillColor} />`;
         })}
       </svg>
       <img
         src="https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main/data/population-density-layer_adjusted1.png"
-        class="map-overlay"
+        class="map-overlay absolute top-0 left-0 w-full h-full object-contain block pointer-events-none opacity-90 object-contain "
         alt="Population density overlay"
         width="${width}"
         height="${height}"
+        style="image-rendering: auto;"
       />
 
-      <svg class="map-svg" viewBox="0 0 ${width} ${height}">
+      <svg
+        class="map-svg absolute top-0 left-0 w-full h-full object-contain block"
+        viewBox="0 0 ${width} ${height}"
+      >
         <g class="states-layer">
           ${statesArray.map((state) => {
             return html`<path
@@ -260,9 +271,21 @@ export function Map({ usGeoData, places }) {
         handleCloseDetails=${handleCloseDetails}
       />`}
     </div>
-    <div class="map-buttons">
-      <button class="map-button" onClick=${handleZoomIn}>+</button>
-      <button class="map-button" onClick=${handleZoomOut}>-</button>
+    <div
+      class="map-buttons absolute bottom-10 right-4 z-10 flex flex-col space-y-2"
+    >
+      <button
+        class="map-button border border-solid border-white"
+        onClick=${handleZoomIn}
+      >
+        +
+      </button>
+      <button
+        class="map-button border border-solid border-white"
+        onClick=${handleZoomOut}
+      >
+        -
+      </button>
     </div>
     ${showOverlay &&
     html`<${Overlay}

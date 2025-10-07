@@ -6,13 +6,13 @@ export function MarkerDetails({
   handleCloseDetails,
 }) {
   return html`<div
-    className="marker-details"
+    className="marker-details absolute bg-white p-4 rounded shadow-lg"
     style="top: ${markerDetails ? markerDetails.y : 0}px; left: ${markerDetails
       ? markerDetails.x
       : 0}px;"
   >
     <svg
-      class="close-icon"
+      class="close-icon absolute top-2 right-2 cursor-pointer h-6 w-6"
       onclick=${handleCloseDetails}
       width="34"
       height="35"
