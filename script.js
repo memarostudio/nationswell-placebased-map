@@ -33,8 +33,8 @@ function Content() {
       .then(setUsGeoData);
 
     d3.csv(
-      // "https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main/data/states-albers-10m.json"
-      "./data/places.csv"
+      "https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main/data/places.csv"
+      //"./data/places.csv"
     ).then((data) => {
       // preprocess data as needed
       data.forEach((d) => {
