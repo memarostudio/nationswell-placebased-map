@@ -1,12 +1,8 @@
 import { html, useState, useRef } from "./preact-htm.js";
-import { stateMapping } from "./helper.js";
-
-// The TopoJSON is already pre-projected to pixel coordinates (Albers USA)
-// So we use identity projection for the SVG paths
-const geoPath = d3.geoPath();
-
-// For converting lat/long to screen coordinates, we need the projection
-const projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
+import { stateMapping, latLonToScreen } from "./helper.js";
+import { Marker } from "./marker.js";
+import { Overlay } from "./overlay.js";
+import { MarkerDetails } from "./markerDetails.js";
 
 export function Map({ usGeoData }) {
   console.log("Rendering Map with usGeoData:", usGeoData);
@@ -30,7 +26,7 @@ export function Map({ usGeoData }) {
     return {
       name: d.properties.name,
       id: stateMapping[d.properties.name],
-      path: geoPath(d),
+      path: d3.geoPath()(d), // The TopoJSON is already pre-projected to pixel coordinates (Albers USA), so we use identity projection for the SVG paths
       fillColor: "#7C99FF",
     };
   });
@@ -38,14 +34,7 @@ export function Map({ usGeoData }) {
   const width = 975;
   const height = 610;
 
-  const markers = [
-    { lat: 40.7128, lon: -74.006, label: "New York City" }, // NYC
-  ];
-
-  // Convert lat/lon to screen coordinates
-  function latLonToScreen(lat, lon) {
-    return projection([lon, lat]);
-  }
+  const markers = [{ lat: 40.7128, lon: -74.006, label: "New York City" }];
 
   const ZOOM_STEP = 0.3;
   const MIN_ZOOM = 1;
@@ -239,58 +228,26 @@ export function Map({ usGeoData }) {
             if (!coords) return null; // Skip if outside projection bounds
 
             const [x, y] = coords;
-            return html`<g
-              class="marker"
-              onclick=${(event) => handleMarkerClick(event, marker)}
-            >
-              <g class="marker-default">
-                <circle cx=${x} cy=${y} r="${24 / 2}" fill="white" />
-              </g>
-
-              <g class="marker-hovered">
-                <circle
-                  cx=${x}
-                  cy=${y}
-                  r="${66 / 2}"
-                  fill="#061A6199"
-                  stroke="#061A61"
-                  stroke-width="2"
-                />
-                <circle cx=${x} cy=${y} r="${14 / 2}" fill="white" />
-              </g>
-            </g>`;
+            return html`<${Marker}
+              marker=${marker}
+              x=${x}
+              y=${y}
+              handleMarkerClick=${handleMarkerClick}
+            />`;
           })}
         </g>
       </svg>
       ${showMarkerDetails &&
-      html`<div
-        className="marker-details"
-        style="top: ${markerDetails
-          ? markerDetails.y
-          : 0}px; left: ${markerDetails ? markerDetails.x : 0}px;"
-      >
-        <p>Marker Details</p>
-        <button onclick=${() => viewProjectDetails(markerDetails)}>
-          View project details
-        </button>
-      </div>`}
+      html`<${MarkerDetails}
+        markerDetails=${markerDetails}
+        viewProjectDetails=${viewProjectDetails}
+      />`}
     </div>
     <div class="map-buttons">
       <button class="map-button" onClick=${handleZoomIn}>+</button>
       <button class="map-button" onClick=${handleZoomOut}>-</button>
     </div>
     ${showOverlay &&
-    html`<div class="map-details-overlay">
-      <div class="map-details-content">
-        <img
-          class="close-icon"
-          src="https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main/data/close.svg"
-          alt="Close map details overlay"
-          onclick=${handleCloseDetails}
-        />
-        <p>details view</p>
-      </div>
-      <div class="map-details-background"></div>
-    </div>`}
+    html`<${Overlay} handleCloseDetails=${handleCloseDetails} />`}
   </div>`;
 }

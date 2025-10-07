@@ -52,3 +52,11 @@ export const stateMapping = {
   Wyoming: "WY",
   "District of Columbia": "DC",
 };
+
+// For converting lat/long to screen coordinates, we need the projection
+const projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
+
+// Convert lat/lon to screen coordinates
+export function latLonToScreen(lat, lon) {
+  return projection([lon, lat]);
+}
