@@ -43,9 +43,14 @@ function Content() {
         d["lon"] = +d["Longitude"];
         d["gini"] = +d["Gini Coefficient"];
         d["name"] = d["Project Name"];
-        d["startYear"] = d["Start Year"];
+        d["startYear"] =
+          d["Start Year"] && d["Start Year"] !== "" ? d["Start Year"] : "20xx";
         d["endYear"] = d["End Year"];
-        d["previewDescription"] = d["Project Preview Description"];
+        d["previewDescription"] =
+          d["Project Preview Description"] &&
+          d["Project Preview Description"] !== ""
+            ? d["Project Preview Description"]
+            : "Placeholder MPN functions as both a network catalyst and a collaborative architect, enabling funders to come together, learn together, and act together. ";
         d["description"] = d["Project Description"];
         d["city"] = d["City"];
         d["state"] = d["State"];
