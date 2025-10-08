@@ -1,6 +1,6 @@
 import { html, useState } from "./preact-htm.js";
 
-export function Marker({ marker, handleMarkerHover, handleMarkerClick, x, y }) {
+export function Marker({ marker, handleMarkerClick, x, y }) {
   const [isHovered, setIsHovered] = useState(false);
 
   // Calculate dynamic width based on marker name length
@@ -18,11 +18,9 @@ export function Marker({ marker, handleMarkerHover, handleMarkerClick, x, y }) {
       onclick=${(event) => handleMarkerClick(event, marker)}
       onMouseEnter=${() => {
         setIsHovered(true);
-        handleMarkerHover(marker);
       }}
       onMouseLeave=${() => {
         setIsHovered(false);
-        // handleMarkerHover(null);
       }}
     >
       <g
@@ -47,7 +45,48 @@ export function Marker({ marker, handleMarkerHover, handleMarkerClick, x, y }) {
           stroke-width="2"
         />
         <circle cx=${x} cy=${y} r="${14 / 2}" class="fill-white" />
+
+        <g class="tooltip-layer" transform="translate(0, 1)">
+          <rect
+            x="${x + 15}"
+            y="${y - 15}"
+            width="${marker.city.length * 7 + 24}"
+            height="26"
+            fill="black"
+            rx="4"
+            ry="4"
+          />
+          <text
+            x="${x + 27}"
+            y="${y - 2}"
+            dy="1"
+            fill="white"
+            font-size="14"
+            font-family="system-ui, sans-serif"
+            dominant-baseline="middle"
+          >
+            ${marker.city}
+          </text>
+        </g>
       </g>
     </g>
   `;
 }
+
+//  <rect
+//           x="${x + 66 / 2 + 3}"
+//           y="${y - 28 / 2}"
+//           width="${textWidth}"
+//           height="28"
+//           rx="6"
+//           ry="6"
+//           class="fill-black"
+//         />
+//         <text
+//           x="${x + 66 / 2 + 3 + 10}"
+//           y="${y}"
+//           dy="1"
+//           class="fill-white font-authentic text-sm line-height-[20px]"
+//           dominant-baseline="middle"
+//           >${marker.name}</text
+//         >

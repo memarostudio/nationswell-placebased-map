@@ -19,7 +19,6 @@ export function Map({ usGeoData, places }) {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const mapContainerRef = useRef(null);
 
-  const [markerHovered, setMarkerHovered] = useState(null);
   const [showMarkerDetails, setShowMarkerDetails] = useState(false);
   const [markerDetails, setMarkerDetails] = useState(null);
   const [showOverlay, setShowOverlay] = useState(false);
@@ -177,17 +176,6 @@ export function Map({ usGeoData, places }) {
     cursor: isDragging ? "grabbing" : "grab",
   };
 
-  function handleMarkerHover(marker) {
-    if (marker) {
-      console.log(`Hovering over marker`, marker);
-      const hoveredMarkerCoords = latLonToScreen(marker.lat, marker.lon);
-      console.log("Hovered marker coords:", hoveredMarkerCoords);
-      marker.x = hoveredMarkerCoords[0];
-      marker.y = hoveredMarkerCoords[1];
-      setMarkerHovered(marker);
-    }
-  }
-
   function handleMarkerClick(event, marker) {
     setShowMarkerDetails(true);
 
@@ -270,20 +258,10 @@ export function Map({ usGeoData, places }) {
               x=${x}
               y=${y}
               handleMarkerClick=${handleMarkerClick}
-              handleMarkerHover=${handleMarkerHover}
             />`;
           })}
         </g>
       </svg>
-      ${markerHovered &&
-      html`
-        <div
-          class="absolute text-white bg-black py-1 px-3 text-sm rounded"
-          style="top: ${markerHovered.y}px; left: ${markerHovered.x}px;"
-        >
-          ${markerHovered.name}
-        </div>
-      `}
       ${showMarkerDetails &&
       html`<${MarkerDetails}
         markerDetails=${markerDetails}
