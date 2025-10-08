@@ -75,7 +75,7 @@ export function MarkerDetails({
       <button
         onclick=${() => viewProjectDetails(markerDetails.id)}
         class="bg-vis-main-blue w-full flex flex-row justify-between px-4 py-2 mt-4"
-        style="background-image: url('../assets/gradient_texture_blue.png'); background-size: cover; background-position: center;"
+        style="background-image: url('../assets/gradient_texture_blue_button.png'); background-size: cover; background-position: center;"
       >
         <span class="font-sora text-sm uppercase text-vis-text-inverted"
           >View project details</span
