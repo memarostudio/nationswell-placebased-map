@@ -1,14 +1,29 @@
 import { html, useState } from "./preact-htm.js";
 
-export function Marker({ marker, handleMarkerClick, x, y }) {
+export function Marker({ marker, handleMarkerHover, handleMarkerClick, x, y }) {
   const [isHovered, setIsHovered] = useState(false);
+
+  // Calculate dynamic width based on marker name length
+  const baseWidth = 0; // minimum width
+  const charWidth = 7.75; // average width per character (adjust as needed)
+  const textWidth = baseWidth + marker.name.length * charWidth;
+
+  console.log(
+    `Rendering marker: ${marker.name} at (${x}, ${y} with textWidth: ${textWidth})`
+  );
 
   return html`
     <g
       class="marker pointer-events-auto cursor-pointer"
       onclick=${(event) => handleMarkerClick(event, marker)}
-      onMouseEnter=${() => setIsHovered(true)}
-      onMouseLeave=${() => setIsHovered(false)}
+      onMouseEnter=${() => {
+        setIsHovered(true);
+        handleMarkerHover(marker);
+      }}
+      onMouseLeave=${() => {
+        setIsHovered(false);
+        // handleMarkerHover(null);
+      }}
     >
       <g
         class="marker-default ${isHovered
