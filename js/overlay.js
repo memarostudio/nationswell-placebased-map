@@ -214,24 +214,29 @@ function GiniCoefficientChart({ gini }) {
   }, []);
 
   gini = 1;
-  // create a angle scaled to map gini value (0-1) to angle (-90 to 90)
-  const angle = gini * (Math.PI / 2); // convert to radians
+  // Map gini value (0-1) to angle range:
+  // gini=0 -> bottom left (225°/-3π/4)
+  // gini=0.5 -> top middle (270°/-π/2)
+  // gini=1 -> bottom right (315°/-π/4)
+  const startAngle = (-3 * Math.PI) / 4; // -135° (bottom left)
+  const endAngle = -Math.PI / 4; // -45° (bottom right)
+  const angle = startAngle + gini * (endAngle - startAngle);
 
-  // calculate x and y position based on angle and width/height of the image
-  // x = centerX + radius * cos(angle)
-  // y = centerY - radius * sin(angle) (subtract because y axis is inverted in screen coordinates)
-  // centerX and centerY are half of width and height respectively
-  // radius is half of width or height, whichever is smaller, minus some padding (e.g., 10px)
-  const radius = Math.min(width, height) / 2 - 10;
+  // Calculate line endpoints for a 20px line centered at bottom center of SVG
+  const lineLength = width / 2;
   const centerX = width / 2;
-  const centerY = height;
-  const x = centerX + radius * Math.cos(angle);
-  const y = centerY - radius * Math.sin(angle);
+  const centerY = height; // Bottom center of SVG
+
+  // Calculate start and end points of the line
+  const startX = centerX;
+  const startY = centerY;
+  const endX = centerX + lineLength * Math.cos(angle);
+  const endY = centerY + lineLength * Math.sin(angle);
 
   console.log(
-    `Gini: ${gini}, Angle: ${angle}, Position: (${x.toFixed(2)}, ${y.toFixed(
+    `Gini: ${gini}, Angle: ${angle}, Line: (${startX}, ${startY}) to (${endX.toFixed(
       2
-    )})`
+    )}, ${endY.toFixed(2)})`
   );
 
   return html`<div class="relative">
@@ -246,23 +251,17 @@ function GiniCoefficientChart({ gini }) {
           height="${height}"
           style="position: absolute; top: 0; left: 0; overflow: visible;"
         >
-          <rect
-            x="0"
-            y="0"
-            width="${width}"
-            height="${height}"
-            fill="red"
-            opacity="0.5"
+          <rect width="${width}" height="${height}" fill="red" opacity="0.5" />
+          <line
+            x1="${startX}"
+            y1="${startY}"
+            x2="${endX}"
+            y2="${endY}"
+            stroke="#0F100F"
+            stroke-width="3"
+            stroke-linecap="round"
           />
-          <rect
-            x="0"
-            y="0"
-            height="4"
-            width="${width * 0.19}"
-            fill="#0F100F"
-            opacity="0.5"
-          />
-          <circle cx="${x}" cy="${y}" r="6" fill="#0F100F" />
+          <circle cx="${centerX}" cy="${centerY}" r="2" fill="red" />
         </svg>`
       : null}
     <p
