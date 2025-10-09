@@ -258,18 +258,19 @@ export function Map({ usGeoData, places }) {
               marker=${marker}
               x=${x}
               y=${y}
+              zoom=${zoom}
               handleMarkerClick=${handleMarkerClick}
             />`;
           })}
         </g>
       </svg>
-      ${showMarkerDetails &&
-      html`<${MarkerDetails}
-        markerDetails=${markerDetails}
-        viewProjectDetails=${viewProjectDetails}
-        handleCloseDetails=${handleCloseDetails}
-      />`}
     </div>
+    ${showMarkerDetails &&
+    html`<${MarkerDetails}
+      markerDetails=${markerDetails}
+      viewProjectDetails=${viewProjectDetails}
+      handleCloseDetails=${handleCloseDetails}
+    />`}
     <div
       class="map-buttons absolute bottom-10 right-4 z-10 flex flex-col space-y-2"
     >
