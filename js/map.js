@@ -22,8 +22,8 @@ export function Map({ usGeoData, places }) {
 
   const [showMarkerDetails, setShowMarkerDetails] = useState(false);
   const [markerDetails, setMarkerDetails] = useState(null);
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [overlayPlaceId, setOverlayPlaceId] = useState(null);
+  const [showOverlay, setShowOverlay] = useState(true);
+  const [overlayPlaceId, setOverlayPlaceId] = useState(1);
 
   if (!usGeoData) {
     return html`<div>Loading US Geo data...</div>`;

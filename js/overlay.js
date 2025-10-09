@@ -1,4 +1,4 @@
-import { html } from "./preact-htm.js";
+import { html, useEffect, useState } from "./preact-htm.js";
 import {
   getFocusAreaGroupIcon,
   getFocusAreaGroupFromArea,
@@ -148,6 +148,7 @@ export function Overlay({ place, handleCloseOverlay }) {
         <div class="col-span-1">state shape</div>
         <div class="col-span-1 p-6 bg-vis-surface-primary-tonal">
           <p class="${titleClasses}  text-vis-text-primary">gini coefficient</p>
+          <${GiniCoefficientChart} gini=${place.gini} />
         </div>
       </div>
       <div class="grid grid-cols-5">
@@ -194,5 +195,80 @@ export function Overlay({ place, handleCloseOverlay }) {
     <div
       class="map-details-background absolute inset-0 bg-black opacity-50 backdrop-blur-md"
     ></div>
+  </div>`;
+}
+
+function GiniCoefficientChart({ gini }) {
+  const [width, setWidth] = useState(null);
+  const [height, setHeight] = useState(null);
+  // get width and height of the image
+  useEffect(() => {
+    const giniEllipse = document.getElementById("gini-ellipse");
+    if (giniEllipse) {
+      const width = giniEllipse.clientWidth;
+      const height = giniEllipse.clientHeight;
+      console.log("Gini Coefficient:", width, height);
+      setWidth(width);
+      setHeight(height);
+    }
+  }, []);
+
+  gini = 1;
+  // create a angle scaled to map gini value (0-1) to angle (-90 to 90)
+  const angle = gini * (Math.PI / 2); // convert to radians
+
+  // calculate x and y position based on angle and width/height of the image
+  // x = centerX + radius * cos(angle)
+  // y = centerY - radius * sin(angle) (subtract because y axis is inverted in screen coordinates)
+  // centerX and centerY are half of width and height respectively
+  // radius is half of width or height, whichever is smaller, minus some padding (e.g., 10px)
+  const radius = Math.min(width, height) / 2 - 10;
+  const centerX = width / 2;
+  const centerY = height;
+  const x = centerX + radius * Math.cos(angle);
+  const y = centerY - radius * Math.sin(angle);
+
+  console.log(
+    `Gini: ${gini}, Angle: ${angle}, Position: (${x.toFixed(2)}, ${y.toFixed(
+      2
+    )})`
+  );
+
+  return html`<div class="relative">
+    <img
+      src="../assets/gini_coefficient_ellipse.png"
+      alt="Gini Coefficient Chart"
+      id="gini-ellipse"
+    />
+    ${width && height
+      ? html`<svg
+          width="${width}"
+          height="${height}"
+          style="position: absolute; top: 0; left: 0; overflow: visible;"
+        >
+          <rect
+            x="0"
+            y="0"
+            width="${width}"
+            height="${height}"
+            fill="red"
+            opacity="0.5"
+          />
+          <rect
+            x="0"
+            y="0"
+            height="4"
+            width="${width * 0.19}"
+            fill="#0F100F"
+            opacity="0.5"
+          />
+          <circle cx="${x}" cy="${y}" r="6" fill="#0F100F" />
+        </svg>`
+      : null}
+    <p
+      class="absolute bottom-[4px] left-[50%] transform -translate-x-[50%] font-sora text-[14px] font-bold"
+    >
+      ${(gini * 100).toFixed(0)}%
+    </p>
   </div>`;
 }
