@@ -9,6 +9,8 @@ export function Overlay({ place, handleCloseOverlay }) {
     return null;
   }
 
+  console.log("Rendering Overlay for place:", place);
+
   const titleClasses = "font-sora text-sm uppercase mb-4 font-bold";
   return html`<div class="map-details-overlay absolute inset-0 z-[10001]">
     <div
@@ -42,8 +44,10 @@ export function Overlay({ place, handleCloseOverlay }) {
           </p>
           <p class="text-vis-text-inverted text-[32px]">${place.name}</p>
         </div>
-        <button
-          onclick=${() => viewProjectDetails(markerDetails.id)}
+        <a
+          href=${place.projectLink}
+          target="_blank"
+          rel="noopener noreferrer"
           class="bg-[#0F100F] flex flex-row justify-between px-4 py-[10px] mt-4"
         >
           <span class="font-sora text-sm uppercase text-vis-text-inverted pr-6"
@@ -61,12 +65,85 @@ export function Overlay({ place, handleCloseOverlay }) {
               fill="#FBF9F4"
             />
           </svg>
-        </button>
+        </a>
       </div>
       <div class="grid grid-cols-5">
-        <div class="col-span-2 p-6">longer text here</div>
+        <div
+          class="col-span-2 p-6 text-vis-text-primary text-[16px] leading-[155%] font-authentic"
+        >
+          ${place.description}
+        </div>
         <div class="col-span-1 p-6 bg-vis-surface-primary-tonal">
           <p class="${titleClasses} text-vis-text-primary">location</p>
+          <div
+            class="flex flex-col space-y-2 font-authentic text-[16px] leading-[155%] text-vis-text-primary"
+          >
+            <div class="flex flex-row space-x-1">
+              <svg width="21" height="21" fill="none" viewBox="0 0 21 21">
+                <g>
+                  <path
+                    stroke="#000"
+                    stroke-width="1.25"
+                    d="M16.898 8.833c0 3.682-6.667 10-6.667 10s-6.667-6.318-6.667-10a6.667 6.667 0 1 1 13.334 0Z"
+                  />
+                  <path
+                    fill="#000"
+                    stroke="#000"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.25"
+                    d="M10.23 9.667a.833.833 0 1 0 0-1.667.833.833 0 0 0 0 1.667Z"
+                  />
+                </g></svg
+              ><span>${place.city}, ${place.state}</span>
+            </div>
+            <div class="flex flex-row space-x-1">
+              <svg width="21" height="21" fill="none" viewBox="0 0 21 21">
+                <g>
+                  <path
+                    stroke="#000"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.25"
+                    d="M6.064 8.008 6.073 8m3.323.008L9.405 8m-3.341 3.342.009-.01m3.323.01.009-.01m-3.341 3.343.009-.009m3.323.009.009-.009M12.73 18h-9.5a.5.5 0 0 1-.5-.5V5.167a.5.5 0 0 1 .5-.5h4.5V3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5V8m0 10h4.5a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-4.5m0 10v-3.333m0-6.667v3.333m0 3.334v-3.334m0 3.334h1.667m-1.667-3.334h1.667"
+                  />
+                </g>
+              </svg>
+              <span>${place.areaType}</span>
+            </div>
+            <div class="flex flex-row space-x-1">
+              <svg width="21" height="21" fill="none" viewBox="0 0 21 21">
+                <defs>
+                  <clipPath id="a" class="a">
+                    <path fill="#fff" d="M.23.5h20v20h-20z" />
+                  </clipPath>
+                </defs>
+                <g clip-path="url(#a)">
+                  <path
+                    stroke="#000"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.25"
+                    d="M6.064 15.5v-.833a4.167 4.167 0 1 1 8.334 0v.833m-13.334 0v-.834a2.5 2.5 0 0 1 2.5-2.5M19.396 15.5v-.834a2.5 2.5 0 0 0-2.5-2.5"
+                  />
+                  <path
+                    stroke="#000"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.25"
+                    d="M10.23 10.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm-6.667 1.667a1.667 1.667 0 1 0 0-3.333 1.667 1.667 0 0 0 0 3.333Zm13.334 0a1.667 1.667 0 1 0 0-3.333 1.667 1.667 0 0 0 0 3.333Z"
+                  />
+                </g>
+              </svg>
+              <div>
+                <span>${place.populationSize}</span>
+                <span
+                  class="block font-libre font-italic text-[14px] leading-[135%] text-vis-text-secondary"
+                  >as of ${place.populationDataYear}</span
+                >
+              </div>
+            </div>
+          </div>
         </div>
         <div class="col-span-1">state shape</div>
         <div class="col-span-1 p-6 bg-vis-surface-primary-tonal">
@@ -74,12 +151,18 @@ export function Overlay({ place, handleCloseOverlay }) {
         </div>
       </div>
       <div class="grid grid-cols-5">
-        <div class="col-span-2 p-6 bg-vis-surface-primary">
+        <div
+          class="col-span-2 p-6 bg-vis-surface-primary"
+          style="background-image: url('../assets/gradient_texture_gray_bg.png'); background-size: cover; background-position: center;"
+        >
           <p class="${titleClasses} text-vis-text-primary">highlight</p>
-          longer text here
+          <span
+            class="text-vis-text-primary text-[16px] leading-[155%] font-authentic "
+            >${place.highlight}</span
+          >
         </div>
         <div class="col-span-3">
-          <div class="p-6">
+          <div class="p-6 bg-vis-surface-primary">
             <p class="${titleClasses} text-vis-text-primary">Focus area(s)</p>
             <div class="flex flex-wrap gap-2">
               ${place.focusAreas && place.focusAreas.length > 0
@@ -102,7 +185,7 @@ export function Overlay({ place, handleCloseOverlay }) {
           <div class="p-6 bg-vis-main-blue">
             <p class="${titleClasses} text-vis-text-inverted">support types</p>
           </div>
-          <div class="p-6">
+          <div class="p-6 bg-white">
             <p class="${titleClasses} text-vis-text-primary">partners</p>
           </div>
         </div>

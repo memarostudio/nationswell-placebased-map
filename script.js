@@ -51,13 +51,35 @@ function Content() {
           d["Project Preview Description"] !== ""
             ? d["Project Preview Description"]
             : "Placeholder MPN functions as both a network catalyst and a collaborative architect, enabling funders to come together, learn together, and act together. ";
-        d["description"] = d["Project Description"];
+        d["description"] =
+          d["Project Description"] && d["Project Description"] !== ""
+            ? d["Project Description"]
+            : "No description available.";
+        d["highlight"] =
+          d["Key Highlight"] && d["Key Highlight"] !== ""
+            ? d["Key Highlight"]
+            : "No key highlight available.";
         d["city"] = d["City"];
         d["state"] = d["State"];
         d["focusAreas"] =
           d["Focus Area(s) (Dropdown)"] && d["Focus Area(s) (Dropdown)"] !== ""
             ? d["Focus Area(s) (Dropdown)"].split(",").map((f) => f.trim())
             : [];
+        d["areaType"] =
+          d["Area Type"] && d["Area Type"] !== "" ? d["Area Type"] : null;
+
+        d["populationSize"] =
+          d["Population Size (City)"] && d["Population Size (City)"] !== ""
+            ? d["Population Size (City)"]
+            : null;
+        d["populationDataYear"] =
+          d["Population Data Year"] && d["Population Data Year"] !== ""
+            ? d["Population Data Year"]
+            : null;
+        d["projectLink"] =
+          d["Project Link (URL)"] && d["Project Link (URL)"] !== ""
+            ? d["Project Link (URL)"]
+            : null;
       });
       data = data.filter((p) => p["name"] !== "");
       console.log("Loaded places data:", data);

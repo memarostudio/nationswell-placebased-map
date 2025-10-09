@@ -11,10 +11,6 @@ export function Marker({ marker, handleMarkerClick, x, y, zoom = 1 }) {
   // Calculate inverse scale to maintain constant size
   const inverseScale = 1 / zoom;
 
-  console.log(
-    `Rendering marker: ${marker.name} at (${x}, ${y} with textWidth: ${textWidth})`
-  );
-
   return html`
     <g
       class="marker pointer-events-auto cursor-pointer transition-transform duration-300"
