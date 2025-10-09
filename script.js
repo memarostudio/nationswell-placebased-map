@@ -54,8 +54,13 @@ function Content() {
         d["description"] = d["Project Description"];
         d["city"] = d["City"];
         d["state"] = d["State"];
+        d["focusAreas"] =
+          d["Focus Area(s) (Dropdown)"] && d["Focus Area(s) (Dropdown)"] !== ""
+            ? d["Focus Area(s) (Dropdown)"].split(",").map((f) => f.trim())
+            : [];
       });
       data = data.filter((p) => p["name"] !== "");
+      console.log("Loaded places data:", data);
       setPlacesData(data);
     });
   }, []);

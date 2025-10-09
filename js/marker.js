@@ -50,7 +50,7 @@ export function Marker({ marker, handleMarkerClick, x, y, zoom = 1 }) {
         />
         <circle cx=${x} cy=${y} r="${14 / 2}" class="fill-white" />
 
-        <g class="tooltip-layer" transform="translate(0, 1)">
+        <g class="tooltip-layer" transform="translate(24, 1)">
           <rect
             x="${x + 15}"
             y="${y - 15}"
@@ -65,7 +65,7 @@ export function Marker({ marker, handleMarkerClick, x, y, zoom = 1 }) {
             y="${y - 2}"
             dy="1"
             fill="white"
-            font-size="14"
+            font-size="14px"
             font-family="system-ui, sans-serif"
             dominant-baseline="middle"
           >
@@ -76,21 +76,3 @@ export function Marker({ marker, handleMarkerClick, x, y, zoom = 1 }) {
     </g>
   `;
 }
-
-//  <rect
-//           x="${x + 66 / 2 + 3}"
-//           y="${y - 28 / 2}"
-//           width="${textWidth}"
-//           height="28"
-//           rx="6"
-//           ry="6"
-//           class="fill-black"
-//         />
-//         <text
-//           x="${x + 66 / 2 + 3 + 10}"
-//           y="${y}"
-//           dy="1"
-//           class="fill-white font-authentic text-sm line-height-[20px]"
-//           dominant-baseline="middle"
-//           >${marker.name}</text
-//         >

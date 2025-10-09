@@ -1,4 +1,8 @@
 import { html } from "./preact-htm.js";
+import {
+  getFocusAreaGroupIcon,
+  getFocusAreaGroupFromArea,
+} from "./focusAreas.js";
 
 export function Overlay({ place, handleCloseOverlay }) {
   if (!place) {
@@ -76,7 +80,24 @@ export function Overlay({ place, handleCloseOverlay }) {
         </div>
         <div class="col-span-3">
           <div class="p-6">
-            <p class="${titleClasses} text-vis-text-primary">focus area(s)</p>
+            <p class="${titleClasses} text-vis-text-primary">Focus area(s)</p>
+            <div class="flex flex-wrap gap-2">
+              ${place.focusAreas && place.focusAreas.length > 0
+                ? place.focusAreas.map((focusArea) => {
+                    return html`<div
+                      class="flex flex-row space-x-2 items-center text-vis-text-primary px-3 py-1 rounded-full text-sm font-sora uppercase border border-solid border-[#B6B6B6]"
+                    >
+                      <div class="w-[10px] h-[10px]">
+                        ${getFocusAreaGroupIcon(
+                          getFocusAreaGroupFromArea(focusArea),
+                          "#0F100F"
+                        )}
+                      </div>
+                      <span>${focusArea}</span>
+                    </div>`;
+                  })
+                : null}
+            </div>
           </div>
           <div class="p-6 bg-vis-main-blue">
             <p class="${titleClasses} text-vis-text-inverted">support types</p>

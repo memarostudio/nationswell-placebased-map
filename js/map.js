@@ -3,7 +3,7 @@ import { stateMapping, latLonToScreen } from "./helper.js";
 import { Marker } from "./marker.js";
 import { Overlay } from "./overlay.js";
 import { MarkerDetails } from "./markerDetails.js";
-import { FocusAreaLegend } from "./focusAreaLegend.js";
+import { FocusAreaGroupLegend } from "./focusAreas.js";
 
 export function Map({ usGeoData, places }) {
   console.log(
@@ -292,6 +292,6 @@ export function Map({ usGeoData, places }) {
       place=${places.filter((p) => p.id === overlayPlaceId)[0]}
       handleCloseOverlay=${handleCloseOverlay}
     />`}
-    <${FocusAreaLegend} />
+    <${FocusAreaGroupLegend} />
   </div>`;
 }
