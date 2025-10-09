@@ -199,6 +199,10 @@ export function Overlay({ place, handleCloseOverlay }) {
 }
 
 function GiniCoefficientChart({ gini }) {
+  if (!gini) {
+    return html`<p>No Gini Coefficient data available.</p>`;
+  }
+
   const [width, setWidth] = useState(null);
   const [height, setHeight] = useState(null);
   // get width and height of the image
@@ -207,37 +211,25 @@ function GiniCoefficientChart({ gini }) {
     if (giniEllipse) {
       const width = giniEllipse.clientWidth;
       const height = giniEllipse.clientHeight;
-      console.log("Gini Coefficient:", width, height);
       setWidth(width);
       setHeight(height);
     }
   }, []);
 
-  gini = 1;
   // Map gini value (0-1) to angle range:
-  // gini=0 -> bottom left (225°/-3π/4)
-  // gini=0.5 -> top middle (270°/-π/2)
-  // gini=1 -> bottom right (315°/-π/4)
-  const startAngle = (-3 * Math.PI) / 4; // -135° (bottom left)
-  const endAngle = -Math.PI / 4; // -45° (bottom right)
+  const startAngle = Math.PI; // 180° (left)
+  const endAngle = 2 * Math.PI; // 360° (right)
   const angle = startAngle + gini * (endAngle - startAngle);
 
-  // Calculate line endpoints for a 20px line centered at bottom center of SVG
-  const lineLength = width / 2;
+  const lineLength = height * 0.625; // Length of the line as 62.5% of the image height
   const centerX = width / 2;
   const centerY = height; // Bottom center of SVG
 
   // Calculate start and end points of the line
-  const startX = centerX;
-  const startY = centerY;
+  const startX = centerX + (height + 0.01) * Math.cos(angle);
+  const startY = centerY + (height + 0.01) * Math.sin(angle);
   const endX = centerX + lineLength * Math.cos(angle);
   const endY = centerY + lineLength * Math.sin(angle);
-
-  console.log(
-    `Gini: ${gini}, Angle: ${angle}, Line: (${startX}, ${startY}) to (${endX.toFixed(
-      2
-    )}, ${endY.toFixed(2)})`
-  );
 
   return html`<div class="relative">
     <img
@@ -251,7 +243,7 @@ function GiniCoefficientChart({ gini }) {
           height="${height}"
           style="position: absolute; top: 0; left: 0; overflow: visible;"
         >
-          <rect width="${width}" height="${height}" fill="red" opacity="0.5" />
+          <rect width="${width}" height="${height}" fill="red" opacity="0" />
           <line
             x1="${startX}"
             y1="${startY}"
@@ -261,13 +253,35 @@ function GiniCoefficientChart({ gini }) {
             stroke-width="3"
             stroke-linecap="round"
           />
-          <circle cx="${centerX}" cy="${centerY}" r="2" fill="red" />
+          <g opacity="0">
+            <circle cx="${centerX}" cy="${centerY}" r="2" fill="red" />
+            <circle cx="${startX}" cy="${startY}" r="2" fill="green" />
+            <circle cx="${endX}" cy="${endY}" r="2" fill="blue" />
+          </g>
+          <text
+            x="${centerX}"
+            y="${centerY}"
+            dy="-12"
+            fill="#0f100f"
+            font-size="14"
+            text-anchor="middle"
+            class="font-sora font-bold"
+          >
+            ${(gini * 100).toFixed(0)}%
+          </text>
         </svg>`
       : null}
-    <p
-      class="absolute bottom-[4px] left-[50%] transform -translate-x-[50%] font-sora text-[14px] font-bold"
-    >
-      ${(gini * 100).toFixed(0)}%
-    </p>
+    <div class="flex justify-between w-full mt-2">
+      <p
+        class="font-italic font-libre text-[14px] leading-[135%] text-vis-text-secondary "
+      >
+        complete<br />equality
+      </p>
+      <p
+        class="font-italic font-libre text-[14px] leading-[135%] text-vis-text-secondary text-right"
+      >
+        complete<br />inequality
+      </p>
+    </div>
   </div>`;
 }
