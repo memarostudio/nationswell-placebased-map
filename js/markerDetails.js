@@ -1,4 +1,5 @@
 import { html } from "./preact-htm.js";
+import { REPO_URL } from "./helper.js";
 
 export function MarkerDetails({
   markerDetails,
@@ -74,8 +75,8 @@ export function MarkerDetails({
       </p>
       <button
         onclick=${() => viewProjectDetails(markerDetails.id)}
-        class="bg-vis-main-blue w-full flex flex-row justify-between px-4 py-2 mt-4"
-        style="background-image: url('../assets/gradient_texture_blue_button.png'); background-size: cover; background-position: center;"
+        class="bg-vis-main-blue w-full flex flex-row justify-between px-4 py-2 mt-4 bg-cover bg-center"
+        style="background-image: url('${REPO_URL}/assets/gradient_texture_blue_button.png');"
       >
         <span class="font-sora text-sm uppercase text-vis-text-inverted"
           >View project details</span

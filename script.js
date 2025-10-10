@@ -1,5 +1,6 @@
 import { html, renderComponent, useEffect, useState } from "./js/preact-htm.js";
 import { Map } from "./js/map.js";
+import { REPO_URL } from "./js/helper.js";
 
 console.log("Script for place-based map loaded.");
 
@@ -26,14 +27,12 @@ function Content() {
 
   // load data
   useEffect(() => {
-    fetch(
-      "https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main/data/states-albers-10m.json"
-    )
+    fetch(REPO_URL + "/data/states-albers-10m.json")
       .then((res) => res.json())
       .then(setUsGeoData);
 
     d3.csv(
-      "https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main/data/places_with_id.csv"
+      REPO_URL + "/data/places_with_id.csv"
       //"./data/places.csv"
     ).then((data) => {
       // preprocess data as needed

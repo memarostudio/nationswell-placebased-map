@@ -3,6 +3,7 @@ import {
   getFocusAreaGroupIcon,
   getFocusAreaGroupFromArea,
 } from "./focusAreas.js";
+import { REPO_URL } from "./helper.js";
 
 export function Overlay({ place, handleCloseOverlay }) {
   if (!place) {
@@ -34,8 +35,8 @@ export function Overlay({ place, handleCloseOverlay }) {
         />
       </svg>
       <div
-        class="flex flex-row items-end justify-between bg-blue-600 px-6 pt-[33px] pb-6"
-        style="background-image: url('../assets/gradient_texture_blue_overlay_header.png'); background-size: cover; background-position: center;"
+        class="flex flex-row items-end justify-between bg-blue-600 px-6 pt-[33px] pb-6 bg-cover bg-center"
+        style="background-image: url('${REPO_URL}/assets/gradient_texture_blue_overlay_header.png');"
       >
         <div class="flex flex-col items-start gap-2">
           <p class="font-libre text-lg font-italic text-vis-text-inverted">
@@ -153,8 +154,8 @@ export function Overlay({ place, handleCloseOverlay }) {
       </div>
       <div class="grid grid-cols-5">
         <div
-          class="col-span-2 p-6 bg-vis-surface-primary"
-          style="background-image: url('../assets/gradient_texture_gray_bg.png'); background-size: cover; background-position: center;"
+          class="col-span-2 p-6 bg-vis-surface-primary bg-cover bg-center"
+          style="background-image: url('${REPO_URL}/assets/gradient_texture_gray_bg.png');"
         >
           <p class="${titleClasses} text-vis-text-primary">highlight</p>
           <span
@@ -194,6 +195,7 @@ export function Overlay({ place, handleCloseOverlay }) {
     </div>
     <div
       class="map-details-background absolute inset-0 bg-black opacity-50 backdrop-blur-md"
+      onclick=${handleCloseOverlay}
     ></div>
   </div>`;
 }
@@ -205,14 +207,23 @@ function GiniCoefficientChart({ gini }) {
 
   const [width, setWidth] = useState(null);
   const [height, setHeight] = useState(null);
+
   // get width and height of the image
   useEffect(() => {
     const giniEllipse = document.getElementById("gini-ellipse");
     if (giniEllipse) {
-      const width = giniEllipse.clientWidth;
-      const height = giniEllipse.clientHeight;
-      setWidth(width);
-      setHeight(height);
+      const handleLoad = () => {
+        setWidth(giniEllipse.naturalWidth || giniEllipse.width);
+        setHeight(giniEllipse.naturalHeight || giniEllipse.height);
+      };
+      if (giniEllipse.complete) {
+        handleLoad();
+      } else {
+        giniEllipse.addEventListener("load", handleLoad);
+        return () => {
+          giniEllipse.removeEventListener("load", handleLoad);
+        };
+      }
     }
   }, []);
 
@@ -233,7 +244,7 @@ function GiniCoefficientChart({ gini }) {
 
   return html`<div class="relative">
     <img
-      src="../assets/gini_coefficient_ellipse.png"
+      src="${REPO_URL}/assets/gini_coefficient_ellipse.png"
       alt="Gini Coefficient Chart"
       id="gini-ellipse"
     />
@@ -271,7 +282,7 @@ function GiniCoefficientChart({ gini }) {
           </text>
         </svg>`
       : null}
-    <div class="flex justify-between w-full mt-2">
+    <div class="flex justify-between w-full mt-2" style="width: ${width}px">
       <p
         class="font-italic font-libre text-[14px] leading-[135%] text-vis-text-secondary "
       >

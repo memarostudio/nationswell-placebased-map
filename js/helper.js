@@ -60,3 +60,6 @@ const projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
 export function latLonToScreen(lat, lon) {
   return projection([lon, lat]);
 }
+
+export const REPO_URL =
+  "https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main";
