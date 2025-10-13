@@ -39,7 +39,7 @@ export function Map({ usGeoData, places }) {
       name: d.properties.name,
       id: stateMapping[d.properties.name],
       path: d3.geoPath()(d), // The TopoJSON is already pre-projected to pixel coordinates (Albers USA), so we use identity projection for the SVG paths
-      fillColor: "#7C99FF",
+      fillColor: "#ADC7FF",
     };
   });
 
@@ -180,7 +180,27 @@ export function Map({ usGeoData, places }) {
   function handleMarkerClick(event, marker) {
     setShowMarkerDetails(true);
 
-    setMarkerDetails({ ...marker, x: event.clientX, y: event.clientY });
+    const markerRect = event.target.getBoundingClientRect();
+    const containerRect = mapContainerRef.current.getBoundingClientRect();
+
+    const markerCenterX =
+      markerRect.left - containerRect.left + markerRect.width / 2;
+
+    const popupWidth = 448;
+    const popupHeight = 318;
+
+    const offsetX = markerCenterX + 33 + 9;
+
+    let finalX = offsetX;
+    if (offsetX + popupWidth > containerRect.width) {
+      finalX = markerCenterX - popupWidth - 33 - 9;
+    }
+
+    setMarkerDetails({
+      ...marker,
+      x: finalX,
+      y: markerRect.top - containerRect.top + 33 - popupHeight / 2,
+    });
   }
 
   function viewProjectDetails(placeId) {
@@ -243,7 +263,7 @@ export function Map({ usGeoData, places }) {
             return html`<path
               d=${state.path}
               fill="none"
-              stroke="var(--color-palette--blue)"
+              stroke="#F0F0F0"
               stroke-width="1.5"
             />`;
           })}

@@ -10,9 +10,9 @@ export function MarkerDetails({
   console.log("Rendering MarkerDetails with:", markerDetails);
   return html`<div
     className="marker-details absolute bg-white p-6 rounded-xl shadow-lg flex flex-col items-start gap-4 max-w-md"
-    style="top: ${markerDetails
-      ? markerDetails.y - 20
-      : 0}px; left: ${markerDetails ? markerDetails.x + 66 / 2 + 5 : 0}px;"
+    style="top: ${markerDetails ? markerDetails.y : 0}px; left: ${markerDetails
+      ? markerDetails.x
+      : 0}px;"
   >
     <svg
       class="close-icon absolute top-2 right-2 cursor-pointer h-8 w-8"

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Last Published: Fri Oct 03 2025 13:29:53 GMT+0000 (Coordinated Universal Time) -->
+<!-- Last Published: Mon Oct 13 2025 10:28:59 GMT+0000 (Coordinated Universal Time) -->
 <html
   data-wf-domain="nationswell-placebased-staging.webflow.io"
   data-wf-page="68dfbdc996d8d8898d743d66"
@@ -17,7 +17,7 @@
       name="google-site-verification"
     />
     <link
-      href="https://cdn.prod.website-files.com/66966406b76908dc913f0db6/css/nationswell-placebased-staging.webflow.shared.01878e90a.css"
+      href="https://cdn.prod.website-files.com/66966406b76908dc913f0db6/css/nationswell-placebased-staging.webflow.shared.2be5f3bc8.css"
       rel="stylesheet"
       type="text/css"
     />
@@ -654,63 +654,70 @@
         </div>
       </div>
     </div>
-    <div id="map" class="map-container"></div>
-    <div class="map-filters">
-      <div class="w-form">
-        <form
-          id="email-form"
-          name="email-form"
-          data-name="Email Form"
-          method="get"
-          data-wf-page-id="68dfbdc996d8d8898d743d66"
-          data-wf-element-id="0e991016-928a-f5a1-02b3-65fec8226917"
-        >
-          <input
-            type="submit"
-            data-wait="Please wait..."
-            class="d-hide__dt w-button"
-            value="Submit"
-          /><label for="Focus-Areas">Focus Areas</label
-          ><select
-            id="Focus-Areas"
-            name="Focus-Areas"
-            data-name="Focus Areas"
-            multiple=""
-            class="map-select w-select"
-          >
-            <option value="">Select one...</option>
-            <option value="First">First choice</option>
-            <option value="Second">Second choice</option>
-            <option value="Third">Third choice</option></select
-          ><label for="Support-Types">Support Types</label
-          ><select
-            id="Support-Types"
-            name="Support-Types"
-            data-name="Support Types"
-            multiple=""
-            class="map-select w-select"
-          >
-            <option value="">Select one...</option>
-            <option value="First">First choice</option>
-            <option value="Second">Second choice</option>
-            <option value="Third">Third choice</option></select
-          ><label class="w-checkbox"
-            ><input
-              type="checkbox"
-              name="Status"
-              id="Status"
-              data-name="Status"
-              class="w-checkbox-input"
-              checked=""
-            /><span class="w-form-label" for="Status">All Statuses</span></label
-          >
-        </form>
-        <div class="w-form-done">
-          <div>Thank you! Your submission has been received!</div>
+    <div class="w-layout-vflex map-content">
+      <div class="map-nav__spacer"></div>
+      <div class="w-layout-hflex map-filters__container">
+        <div class="map-filters">
+          <div class="w-form">
+            <form
+              id="email-form"
+              name="email-form"
+              data-name="Email Form"
+              method="get"
+              data-wf-page-id="68dfbdc996d8d8898d743d66"
+              data-wf-element-id="0e991016-928a-f5a1-02b3-65fec8226917"
+            >
+              <input
+                type="submit"
+                data-wait="Please wait..."
+                class="d-hide__dt w-button"
+                value="Submit"
+              /><label for="Focus-Areas">Focus Areas</label
+              ><select
+                id="Focus-Areas"
+                name="Focus-Areas"
+                data-name="Focus Areas"
+                multiple=""
+                class="map-select w-select"
+              >
+                <option value="">Select one...</option>
+                <option value="First">First choice</option>
+                <option value="Second">Second choice</option>
+                <option value="Third">Third choice</option></select
+              ><label for="Support-Types">Support Types</label
+              ><select
+                id="Support-Types"
+                name="Support-Types"
+                data-name="Support Types"
+                multiple=""
+                class="map-select w-select"
+              >
+                <option value="">Select one...</option>
+                <option value="First">First choice</option>
+                <option value="Second">Second choice</option>
+                <option value="Third">Third choice</option></select
+              ><label class="w-checkbox"
+                ><input
+                  type="checkbox"
+                  name="Status"
+                  id="Status"
+                  data-name="Status"
+                  class="w-checkbox-input"
+                  checked=""
+                /><span class="w-form-label" for="Status"
+                  >All Statuses</span
+                ></label
+              >
+            </form>
+            <div class="w-form-done">
+              <div>Thank you! Your submission has been received!</div>
+            </div>
+            <div class="w-form-fail">
+              <div>Oops! Something went wrong while submitting the form.</div>
+            </div>
+          </div>
         </div>
-        <div class="w-form-fail">
-          <div>Oops! Something went wrong while submitting the form.</div>
-        </div>
+        <div id="map" class="map-container"></div>
       </div>
     </div>
     <script
@@ -794,7 +801,6 @@
       });
       // Documentation at https://github.com/js-cookie/js-cookie
     </script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
     <script src="https://unpkg.com/topojson@3"></script>
     <script type="module" src="./script.js"></script>
