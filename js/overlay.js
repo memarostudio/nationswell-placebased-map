@@ -164,13 +164,13 @@ export function Overlay({ place, handleCloseOverlay }) {
           >
         </div>
         <div class="col-span-3">
-          <div class="p-6 bg-vis-surface-primary">
-            <p class="${titleClasses} text-vis-text-primary">Focus area(s)</p>
+          <div class="p-6 bg-vis-main-blue">
+            <p class="${titleClasses} text-vis-text-inverted">Focus area(s)</p>
             <div class="flex flex-wrap gap-2">
               ${place.focusAreas && place.focusAreas.length > 0
                 ? place.focusAreas.map((focusArea) => {
                     return html`<div
-                      class="flex flex-row space-x-2 items-center text-vis-text-primary px-3 py-1 rounded-full text-sm font-sora uppercase border border-solid border-[#B6B6B6]"
+                      class="flex flex-row space-x-2 items-center text-vis-text-primary px-3 py-1 rounded-full text-sm font-sora uppercase bg-vis-surface-primary-tonal"
                     >
                       <div class="w-[10px] h-[10px]">
                         ${getFocusAreaGroupIcon(
@@ -184,9 +184,7 @@ export function Overlay({ place, handleCloseOverlay }) {
                 : null}
             </div>
           </div>
-          <div class="p-6 bg-vis-main-blue">
-            <p class="${titleClasses} text-vis-text-inverted">support types</p>
-          </div>
+
           <div class="p-6 bg-white">
             <p class="${titleClasses} text-vis-text-primary">partners</p>
           </div>

@@ -40,14 +40,14 @@ const focusAreasGroups = [
 
 export function FocusAreaGroupLegend() {
   return html`<div
-    class="absolute top-[100px] left-[calc(2.5%+250px)] right-[2.5%] bg-vis-main-blue flex justify-between px-4 py-2"
+    class="absolute top-[100px] left-[calc(2.5%+250px)] right-[2.5%] bg-[#E9FBAE] flex justify-between px-4 py-2"
   >
     ${focusAreasGroups.map((areaGroup) => {
       return html`<div class="flex items-center space-x-2">
         <div class="w-[18px] h-[18px]">
           ${getFocusAreaGroupIcon(areaGroup.label, "#12266B")}
         </div>
-        <span class="text-lg font-libre text-vis-text-inverted"
+        <span class="text-lg font-libre text-vis-text-primary"
           >${areaGroup.label}</span
         >
       </div>`;
@@ -62,6 +62,26 @@ export function getFocusAreaGroupFromArea(area) {
     }
   }
   return null; // or some default value if area not found
+}
+
+export function getAllFocusAreaGroupsForProject(focusAreas) {
+  const groups = new Set();
+  focusAreas.forEach((area) => {
+    const group = getFocusAreaGroupFromArea(area);
+    if (group) {
+      groups.add(group);
+    }
+  });
+  const groupsArray = Array.from(groups);
+
+  // sort groupsArray based on the order in focusAreasGroups
+  groupsArray.sort((a, b) => {
+    const indexA = focusAreasGroups.findIndex((group) => group.label === a);
+    const indexB = focusAreasGroups.findIndex((group) => group.label === b);
+    return indexA - indexB;
+  });
+
+  return groupsArray;
 }
 
 export function getFocusAreaGroupIcon(focusAreaGroup, color = "#12266B") {

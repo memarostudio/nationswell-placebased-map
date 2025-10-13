@@ -1,11 +1,19 @@
 import { html } from "./preact-htm.js";
 import { REPO_URL } from "./helper.js";
+import {
+  getAllFocusAreaGroupsForProject,
+  getFocusAreaGroupIcon,
+} from "./focusAreas.js";
 
 export function MarkerDetails({
   markerDetails,
   viewProjectDetails,
   handleCloseDetails,
 }) {
+  const focusAreasGroups = getAllFocusAreaGroupsForProject(
+    markerDetails.focusAreas
+  );
+  console.log("Rendering MarkerDetails with:", markerDetails, focusAreasGroups);
   return html`<div
     className="marker-details absolute bg-white p-6 rounded-xl shadow-lg flex flex-col items-start gap-4 max-w-md"
     style="top: ${markerDetails
@@ -56,11 +64,23 @@ export function MarkerDetails({
       </p>
     </div>
     <div class="bg-[#F3F0E9] py-4 px-6 flex flex-col items-start">
-      <div>
+      <div class="flex flex-row gap-4 items-center">
         <p class="font-libre text-lg font-italic text-vis-text-secondary">
           ${markerDetails.startYear}${" "}–${" "}
           ${markerDetails.endYear ? markerDetails.endYear : "present"}
         </p>
+        <div class="flex flex-row gap-2">
+          ${focusAreasGroups.length > 0
+            ? focusAreasGroups.map(
+                (focusAreaGroup) => html` <div class="w-[10px] h-[10px]">
+                  ${getFocusAreaGroupIcon(
+                    focusAreaGroup,
+                    "rgba(15, 16, 15, 0.7)"
+                  )}
+                </div>`
+              )
+            : null}
+        </div>
       </div>
 
       <p

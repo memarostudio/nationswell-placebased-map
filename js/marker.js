@@ -28,7 +28,13 @@ export function Marker({ marker, handleMarkerClick, x, y, zoom = 1 }) {
           ? "opacity-0"
           : "opacity-100"} transition-opacity duration-300"
       >
-        <circle cx=${x} cy=${y} r="${24 / 2}" class="fill-white" />
+        <circle
+          cx=${x}
+          cy=${y}
+          r="${24 / 2}"
+          class="fill-white"
+          style="filter: drop-shadow(0 0 6px rgba(11, 41, 148, 0.79))"
+        />
       </g>
 
       <g
@@ -45,30 +51,30 @@ export function Marker({ marker, handleMarkerClick, x, y, zoom = 1 }) {
           stroke-width="2"
         />
         <circle cx=${x} cy=${y} r="${14 / 2}" class="fill-white" />
-
-        <g class="tooltip-layer" transform="translate(24, 1)">
-          <rect
-            x="${x + 15}"
-            y="${y - 15}"
-            width="${marker.city.length * 7 + 24}"
-            height="26"
-            fill="black"
-            rx="4"
-            ry="4"
-          />
-          <text
-            x="${x + 27}"
-            y="${y - 2}"
-            dy="1"
-            fill="white"
-            font-size="14px"
-            font-family="system-ui, sans-serif"
-            dominant-baseline="middle"
-          >
-            ${marker.city}
-          </text>
-        </g>
       </g>
     </g>
   `;
 }
+
+// <g class="tooltip-layer" transform="translate(24, 1)">
+//   <rect
+//     x="${x + 15}"
+//     y="${y - 15}"
+//     width="${marker.city.length * 7 + 24}"
+//     height="26"
+//     fill="black"
+//     rx="4"
+//     ry="4"
+//   />
+//   <text
+//     x="${x + 27}"
+//     y="${y - 2}"
+//     dy="1"
+//     fill="white"
+//     font-size="14px"
+//     font-family="system-ui, sans-serif"
+//     dominant-baseline="middle"
+//   >
+//     ${marker.city}
+//   </text>
+// </g>
