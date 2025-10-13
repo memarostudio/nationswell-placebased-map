@@ -207,6 +207,8 @@ export function Map({ usGeoData, places }) {
     console.log(`Viewing details for marker with id ${placeId}`);
     setShowOverlay(true);
     setOverlayPlaceId(placeId);
+    setMarkerDetails(null);
+    setShowMarkerDetails(false);
   }
 
   function handleCloseOverlay() {
@@ -307,11 +309,11 @@ export function Map({ usGeoData, places }) {
         -
       </button>
     </div>
+    <${FocusAreaGroupLegend} />
     ${showOverlay &&
     html`<${Overlay}
       place=${places.filter((p) => p.id === overlayPlaceId)[0]}
       handleCloseOverlay=${handleCloseOverlay}
     />`}
-    <${FocusAreaGroupLegend} />
-  </div>`;
+  </div> `;
 }

@@ -12,8 +12,27 @@ export function Overlay({ place, handleCloseOverlay }) {
 
   console.log("Rendering Overlay for place:", place);
 
+  // get random value between 1 and 6 for state shape image
+  const randomAreaImage = Math.floor(Math.random() * 6) + 1;
+  let areaImageName = "";
+  switch (place.areaType) {
+    case "Urban":
+      areaImageName = `Area Type=Urban, Option=${randomAreaImage}.png`;
+      break;
+    case "Suburban":
+      areaImageName = `Area Type=Suburban, Option=${randomAreaImage}.png`;
+      break;
+    case "Rural":
+      areaImageName = `Area Type=Rural, Option=${randomAreaImage}.png`;
+      break;
+    default:
+      // Render default content
+      areaImageName = `Area Type=Suburban, Option=${randomAreaImage}.png`;
+      break;
+  }
+
   const titleClasses = "font-sora text-sm uppercase mb-4 font-bold";
-  return html`<div class="map-details-overlay absolute inset-0 z-[10001]">
+  return html`<div class="map-details-overlay fixed inset-0 z-[10001]">
     <div
       class="map-details-content absolute bg-white rounded-lg shadow-lg top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[11] w-[80%] max-h-[80%] overflow-y-auto"
     >
@@ -146,7 +165,10 @@ export function Overlay({ place, handleCloseOverlay }) {
             </div>
           </div>
         </div>
-        <div class="col-span-1">state shape</div>
+        <div
+          class="col-span-1 bg-cover bg-center bg-no-repeat"
+          style="background-image: url('${REPO_URL}/assets/areaImages/${areaImageName}'); margin: -2px;"
+        ></div>
         <div class="col-span-1 p-6 bg-vis-surface-primary-tonal">
           <p class="${titleClasses}  text-vis-text-primary">gini coefficient</p>
           <${GiniCoefficientChart} gini=${place.gini} />
