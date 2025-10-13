@@ -1,6 +1,7 @@
 import { html, renderComponent, useEffect, useState } from "./js/preact-htm.js";
 import { Map } from "./js/map.js";
 import { REPO_URL } from "./js/helper.js";
+import { getAllFocusAreaGroupsForProject } from "./js/focusAreas.js";
 
 console.log("Script for place-based map loaded.");
 
@@ -37,6 +38,8 @@ function Content() {
     ).then((data) => {
       // preprocess data as needed
       data.forEach((d) => {
+        d["approved"] =
+          d["Approval?"] && d["Approval?"].trim() === "Approved" ? true : false;
         d["id"] = +d["Id"];
         d["lat"] = +d["Latitude"];
         d["lon"] = +d["Longitude"];
@@ -80,7 +83,14 @@ function Content() {
             ? d["Project Link (URL)"]
             : null;
       });
-      data = data.filter((p) => p["name"] !== "");
+      data.forEach((d) => {
+        d["focusAreaGroups"] =
+          d["focusAreas"].length > 0
+            ? getAllFocusAreaGroupsForProject(d["focusAreas"])
+            : [];
+      });
+
+      data = data.filter((p) => p["name"] !== "" && p["approved"]);
       console.log("Loaded places data:", data);
       setPlacesData(data);
     });
