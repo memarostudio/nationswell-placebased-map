@@ -82,6 +82,10 @@ function Content() {
           d["Project Link (URL)"] && d["Project Link (URL)"] !== ""
             ? d["Project Link (URL)"]
             : null;
+        d["partners"] =
+          d["Partner(s) "] && d["Partner(s) "] !== ""
+            ? d["Partner(s) "].split(",").map((p) => p.trim())
+            : [];
       });
       data.forEach((d) => {
         d["focusAreaGroups"] =

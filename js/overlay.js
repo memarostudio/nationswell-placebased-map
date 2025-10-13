@@ -26,7 +26,6 @@ export function Overlay({ place, handleCloseOverlay }) {
       areaImageName = `Area Type=Rural, Option=${randomAreaImage}.png`;
       break;
     default:
-      // Render default content
       areaImageName = `Area Type=Suburban, Option=${randomAreaImage}.png`;
       break;
   }
@@ -208,7 +207,18 @@ export function Overlay({ place, handleCloseOverlay }) {
           </div>
 
           <div class="p-6 bg-white">
-            <p class="${titleClasses} text-vis-text-primary">partners</p>
+            <p class="${titleClasses} text-vis-text-primary">Partners</p>
+            <div class="flex flex-row gap-8 items-center h-12 overflow-y-auto">
+              ${place.partners && place.partners.length > 0
+                ? place.partners.map((partner) => {
+                    return html`<img
+                      src="${REPO_URL}/assets/partnerLogos/Partner Name=${partner}.png"
+                      alt="${partner} logo"
+                      class="h-12 object-contain"
+                    />`;
+                  })
+                : null}
+            </div>
           </div>
         </div>
       </div>
