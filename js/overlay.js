@@ -5,7 +5,7 @@ import {
 } from "./focusAreas.js";
 import { REPO_URL } from "./helper.js";
 
-export function Overlay({ place, handleCloseOverlay }) {
+export function Overlay({ place, partners, handleCloseOverlay }) {
   if (!place) {
     return null;
   }
@@ -211,11 +211,23 @@ export function Overlay({ place, handleCloseOverlay }) {
             <div class="flex flex-row gap-8 items-center h-12 overflow-y-auto">
               ${place.partners && place.partners.length > 0
                 ? place.partners.map((partner) => {
-                    return html`<img
-                      src="${REPO_URL}/assets/partnerLogos/Partner Name=${partner}.png"
-                      alt="${partner} logo"
-                      class="h-12 object-contain"
-                    />`;
+                    const partnerData = partners.find(
+                      (p) => p.partnerName === partner
+                    );
+                    if (!partnerData || !partnerData.partnerLink)
+                      return html`<img
+                        src="${REPO_URL}/assets/partnerLogos/Partner Name=${partner}.png"
+                        alt="${partner} logo"
+                        class="h-12 object-contain"
+                      />`;
+                    return html`<a
+                      href=${partnerData.partnerLink}
+                      target="_blank"
+                      ><img
+                        src="${REPO_URL}/assets/partnerLogos/Partner Name=${partner}.png"
+                        alt="${partner} logo"
+                        class="h-12 object-contain"
+                    /></a>`;
                   })
                 : null}
             </div>

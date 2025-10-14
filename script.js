@@ -25,6 +25,7 @@ function renderContent() {
 function Content() {
   const [usGeoData, setUsGeoData] = useState(null);
   const [placesData, setPlacesData] = useState(null);
+  const [partnersData, setPartnersData] = useState(null);
 
   const [statusShowInactiveFilter, setStatusShowInactiveFilter] =
     useState(true);
@@ -102,8 +103,21 @@ function Content() {
       });
 
       data = data.filter((p) => p["name"] !== "" && p["approved"]);
-      console.log("Loaded places data:", data);
+      // console.log("Loaded places data:", data);
       setPlacesData(data);
+    });
+
+    d3.csv(
+      // REPO_URL + "/data/partnerData.csv"
+      "./data/partnerData.csv"
+    ).then((data) => {
+      // preprocess data as needed
+      data.forEach((d) => {
+        d["partnerName"] = d["Funder Name"];
+        d["partnerLink"] = d["Partner Link"];
+      });
+      // console.log("Loaded partner data:", data);
+      setPartnersData(data);
     });
   }, []);
 
@@ -152,7 +166,11 @@ function Content() {
 
   return html`
     ${usGeoData
-      ? html`<${Map} usGeoData=${usGeoData} places=${filteredPlacesData} />`
+      ? html`<${Map}
+          usGeoData=${usGeoData}
+          places=${filteredPlacesData}
+          partners=${partnersData}
+        />`
       : "Loading..."}
   `;
 }
