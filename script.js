@@ -29,6 +29,8 @@ function Content() {
   const [statusShowInactiveFilter, setStatusShowInactiveFilter] =
     useState(true);
 
+  const [focusAreasFilter, setFocusAreasFilter] = useState([]);
+
   // load data
   useEffect(() => {
     fetch(REPO_URL + "/data/states-albers-10m.json")
@@ -105,8 +107,8 @@ function Content() {
     });
   }, []);
 
+  // add event listener for checkbox with id "Status"
   useEffect(() => {
-    // add event listener for checkbox with id "Status"
     const statusCheckbox = document.getElementById("Status");
     if (statusCheckbox) {
       const handleStatusChange = (e) => {
@@ -121,12 +123,32 @@ function Content() {
     }
   }, []);
 
+  // add event listener for checkbox with id "Focus Areas"
+  useEffect(() => {
+    const focusAreasCheckbox = document.getElementById("Focus-Areas");
+    if (focusAreasCheckbox) {
+      const handleFocusAreasChange = (e) => {
+        const value = e.target.value;
+        console.log("Focus Areas filter changed to:", value);
+        setFocusAreasFilter(value);
+      };
+      focusAreasCheckbox.addEventListener("change", handleFocusAreasChange);
+      return () => {
+        focusAreasCheckbox.removeEventListener(
+          "change",
+          handleFocusAreasChange
+        );
+      };
+    }
+  }, []);
+
   // filter places data based on statusInactiveFilter
   const filteredPlacesData = placesData
     ? placesData.filter((p) =>
         statusShowInactiveFilter ? true : p["status"] === "Active"
       )
     : null;
+  // TODO: also filter by focusAreasFilter when implemented in Webflow (multi-select)
 
   return html`
     ${usGeoData
