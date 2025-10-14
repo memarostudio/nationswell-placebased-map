@@ -272,6 +272,13 @@ export function Map({ usGeoData, places, partners }) {
             />`;
           })}
         </g>
+        <rect
+          width=${width}
+          height=${height}
+          fill-opacity="0"
+          onclick=${handleCloseDetails}
+          pointer-events="all"
+        />
         <g class="markers-layer">
           ${places.map((marker) => {
             const coords = latLonToScreen(marker.lat, marker.lon);
