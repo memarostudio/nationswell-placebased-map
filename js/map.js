@@ -105,6 +105,15 @@ export function Map({ usGeoData, places, partners }) {
     }
   }
 
+  function closeFocusAreaDropdown() {
+    const containerElement = document.getElementById(
+      "focus-areas-dropdown-container"
+    );
+    if (containerElement) {
+      containerElement.style.display = "none";
+    }
+  }
+
   // Panning handlers
   function handleMouseDown(e) {
     setIsDragging(true);
@@ -112,6 +121,7 @@ export function Map({ usGeoData, places, partners }) {
       x: e.clientX - pan.x,
       y: e.clientY - pan.y,
     });
+    closeFocusAreaDropdown();
   }
 
   function handleMouseMove(e) {

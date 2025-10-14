@@ -40,7 +40,7 @@ const focusAreasGroups = [
 
 export function FocusAreaGroupLegend() {
   return html`<div
-    class="absolute top-0 left-0 right-0 bg-[#E9FBAE] flex justify-between px-4 py-2 gap-2"
+    class="absolute top-0 left-0 right-0 bg-[#E9FBAE] flex justify-around px-4 py-2 gap-2"
   >
     ${focusAreasGroups.map((areaGroup) => {
       return html`<div class="flex items-center space-x-2">
