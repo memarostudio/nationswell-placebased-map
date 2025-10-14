@@ -84,10 +84,16 @@ export function getAllFocusAreaGroupsForProject(focusAreas) {
   return groupsArray;
 }
 
-export function getFocusAreaGroupIcon(focusAreaGroup, color = "#12266B") {
+export function getFocusAreaGroupIcon(
+  focusAreaGroup,
+  color = "#12266B",
+  size = null
+) {
+  if (!focusAreaGroup) return null;
   switch (focusAreaGroup) {
     case "Arts & Culture":
       return html`<svg
+        width="${size ? size : "100%"}"
         viewBox="0 0 19 18"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -99,6 +105,7 @@ export function getFocusAreaGroupIcon(focusAreaGroup, color = "#12266B") {
       </svg>`;
     case "Capacity Building":
       return html`<svg
+        width="${size ? size : "100%"}"
         viewBox="0 0 19 18"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -118,6 +125,7 @@ export function getFocusAreaGroupIcon(focusAreaGroup, color = "#12266B") {
       </svg> `;
     case "Social Systems":
       return html`<svg
+        width="${size ? size : "100%"}"
         viewBox="0 0 19 18"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -129,6 +137,7 @@ export function getFocusAreaGroupIcon(focusAreaGroup, color = "#12266B") {
       </svg> `;
     case "Economic Development":
       return html`<svg
+        width="${size ? size : "100%"}"
         viewBox="0 0 19 18"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -140,6 +149,7 @@ export function getFocusAreaGroupIcon(focusAreaGroup, color = "#12266B") {
       </svg> `;
     case "Built Environment":
       return html`<svg
+        width="${size ? size : "100%"}"
         viewBox="0 0 19 18"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

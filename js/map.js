@@ -282,6 +282,7 @@ export function Map({ usGeoData, places }) {
               y=${y}
               zoom=${zoom}
               handleMarkerClick=${handleMarkerClick}
+              height=${height}
             />`;
           })}
         </g>

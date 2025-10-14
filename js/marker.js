@@ -1,15 +1,42 @@
 import { html, useState } from "./preact-htm.js";
+import { getFocusAreaGroupIcon } from "./focusAreas.js";
 
-export function Marker({ marker, handleMarkerClick, x, y, zoom = 1 }) {
+export function Marker({ marker, handleMarkerClick, x, y, zoom = 1, height }) {
   const [isHovered, setIsHovered] = useState(false);
-
-  // Calculate dynamic width based on marker name length
-  const baseWidth = 0; // minimum width
-  const charWidth = 7.75; // average width per character (adjust as needed)
-  const textWidth = baseWidth + marker.name.length * charWidth;
 
   // Calculate inverse scale to maintain constant size
   const inverseScale = 1 / zoom;
+
+  const focusAreaIconPositions = [];
+  switch (marker.focusAreaGroups.length) {
+    case 1:
+      focusAreaIconPositions.push({ x: 0, y: -20 });
+      break;
+    case 2:
+      focusAreaIconPositions.push({ x: -8, y: -18 });
+      focusAreaIconPositions.push({ x: 8, y: -18 });
+      break;
+    case 3:
+      focusAreaIconPositions.push({ x: -16, y: -14 });
+      focusAreaIconPositions.push({ x: 0, y: -20 });
+      focusAreaIconPositions.push({ x: 16, y: -14 });
+      break;
+    case 4:
+      focusAreaIconPositions.push({ x: -20, y: -7 });
+      focusAreaIconPositions.push({ x: -8, y: -18 });
+      focusAreaIconPositions.push({ x: 8, y: -18 });
+      focusAreaIconPositions.push({ x: 20, y: -7 });
+      break;
+    case 5:
+      focusAreaIconPositions.push({ x: -20, y: 0 });
+      focusAreaIconPositions.push({ x: -14, y: -14 });
+      focusAreaIconPositions.push({ x: 0, y: -20 });
+      focusAreaIconPositions.push({ x: 14, y: -14 });
+      focusAreaIconPositions.push({ x: 20, y: 0 });
+      break;
+    default:
+      break;
+  }
 
   return html`
     <g
@@ -51,30 +78,17 @@ export function Marker({ marker, handleMarkerClick, x, y, zoom = 1 }) {
           stroke-width="2"
         />
         <circle cx=${x} cy=${y} r="${14 / 2}" class="fill-white" />
+        <g transform="translate(${x - 7}, ${-height / 2 + y})">
+          ${marker.focusAreaGroups.length > 0 &&
+          marker.focusAreaGroups.map((group, index) => {
+            return html`<g
+              transform="translate(${focusAreaIconPositions[index].x +
+              1.5}, ${focusAreaIconPositions[index].y})"
+              >${getFocusAreaGroupIcon(group, "#DAF975", 10)}
+            </g>`;
+          })}
+        </g>
       </g>
     </g>
   `;
 }
-
-// <g class="tooltip-layer" transform="translate(24, 1)">
-//   <rect
-//     x="${x + 15}"
-//     y="${y - 15}"
-//     width="${marker.city.length * 7 + 24}"
-//     height="26"
-//     fill="black"
-//     rx="4"
-//     ry="4"
-//   />
-//   <text
-//     x="${x + 27}"
-//     y="${y - 2}"
-//     dy="1"
-//     fill="white"
-//     font-size="14px"
-//     font-family="system-ui, sans-serif"
-//     dominant-baseline="middle"
-//   >
-//     ${marker.city}
-//   </text>
-// </g>
