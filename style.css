@@ -1,0 +1,10 @@
+#focus-areas-dropdown-container {
+  position: absolute;
+  top: 10px; /* adjusted via code to match trigger position */
+  left: 10px; /* adjusted via code to match trigger position */
+  z-index: 10006;
+  background: #1131a8;
+  width: 311px;
+  height: 388px;
+  display: none; /* Initially hidden */
+}

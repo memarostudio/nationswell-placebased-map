@@ -1,13 +1,128 @@
 import { html, renderComponent, useEffect, useState } from "./js/preact-htm.js";
 import { Map } from "./js/map.js";
 import { REPO_URL } from "./js/helper.js";
-import { getAllFocusAreaGroupsForProject } from "./js/focusAreas.js";
+import {
+  getAllFocusAreaGroupsForProject,
+  getFocusAreaGroupIcon,
+} from "./js/focusAreas.js";
 
 console.log("Script for place-based map loaded.");
+main();
 
-renderContent();
+function main() {
+  // fetch focus area data
+  d3.csv(
+    // REPO_URL + "/data/focusAreasData.csv"
+    "./data/focusAreasData.csv"
+  ).then((data) => {
+    // process focus area data
+    data.forEach((d) => {
+      d["group"] = d["Focus Area Category"];
+      d["area"] = d["Focus Area"];
+    });
 
-function renderContent() {
+    // group focus area data by focus group
+    const groupedData = d3.group(data, (d) => d["group"]);
+    const groupedDataArray = Array.from(groupedData, ([group, areas]) => ({
+      group,
+      areas: areas.map((d) => d["area"]),
+    }));
+
+    // render focus areas dropdown within Webflow container
+    renderFocusAreasDropdown(groupedDataArray);
+
+    // render main content
+    renderContent(data);
+  });
+}
+
+function renderFocusAreasDropdown(focusAreas) {
+  // get trigger element and add event listener to toggle visibility of container
+  const triggerElement = document.getElementById(
+    "focus-areas-dropdown-trigger"
+  );
+  if (triggerElement) {
+    const triggerRightX = triggerElement.getBoundingClientRect().right;
+    const triggerY = triggerElement.getBoundingClientRect().top;
+
+    triggerElement.addEventListener("click", () => {
+      const containerElement = document.getElementById(
+        "focus-areas-dropdown-container"
+      );
+      if (containerElement) {
+        containerElement.style.top = `${triggerY}px`;
+        containerElement.style.left = `${triggerRightX + 10}px`;
+        if (containerElement.style.display !== "block") {
+          containerElement.style.display = "block";
+        } else {
+          containerElement.style.display = "none";
+        }
+
+        renderComponent(
+          html`<${FocusAreaDropdown} focusAreas=${focusAreas} />`,
+          containerElement
+        );
+      }
+    });
+  }
+
+  function FocusAreaDropdown({ focusAreas }) {
+    const [selectedAreas, setSelectedAreas] = useState([]);
+
+    const groupElements = focusAreas.map((group) => {
+      return html` <div
+          class="font-libre w-full block border-b border-vis-surface-primary border-solid text-base italic leading-[135%] flex flex-row items-center p-1"
+        >
+          <div class="h-[18px] w-[18px] inline-block align-middle mr-2">
+            ${getFocusAreaGroupIcon(group.group, "#FBF9F4")}
+          </div>
+          <span>${group.group}</span>
+        </div>
+        <div class="">
+          ${group.areas.map((area) => {
+            const id = area.replace(/\s+/g, "-"); // replace spaces with hyphens for id
+            return html`<div
+              class="hover:bg-[#2148D1] rounded-md cursor-pointer flex flex-row items-center"
+            >
+              <input
+                type="checkbox"
+                id=${id}
+                name="Focus Areas"
+                value=${area}
+                class="block"
+                style="margin-left: 8px; margin-right: 8px;"
+                checked=${selectedAreas.includes(area)}
+                onchange=${(e) => {
+                  const newSelectedAreas = e.target.checked
+                    ? [...selectedAreas, area]
+                    : selectedAreas.filter((a) => a !== area);
+                  setSelectedAreas(newSelectedAreas);
+                  document.dispatchEvent(
+                    new CustomEvent("dropdown-focus-areas-changed", {
+                      detail: { selectedFocusAreas: newSelectedAreas },
+                    })
+                  );
+                }}
+              />
+              <label
+                for=${id}
+                class="inline-block font-authentic text-[14px] leading-[155%] mb-0 p-2 pt-3 grow cursor-pointer"
+                >${area}</label
+              >
+            </div>`;
+          })}
+        </div>`;
+    });
+
+    return html`<div
+      class="text-vis-text-inverted p-2 w-full h-full overflow-y-auto"
+    >
+      ${groupElements}
+    </div>`;
+  }
+}
+
+function renderContent(focusAreas) {
   const containerElement = document.getElementById("map");
   if (containerElement) {
     // clear existing content before rendering
@@ -15,14 +130,17 @@ function renderContent() {
 
     // wait for async Vis to resolve before rendering
     (async () => {
-      renderComponent(html`<${Content} />`, containerElement);
+      renderComponent(
+        html`<${Content} focusAreas=${focusAreas} />`,
+        containerElement
+      );
     })();
   } else {
     console.error(`Could not find container element for ${vis.id}`);
   }
 }
 
-function Content() {
+function Content({ focusAreas }) {
   const [usGeoData, setUsGeoData] = useState(null);
   const [placesData, setPlacesData] = useState(null);
   const [partnersData, setPartnersData] = useState(null);
@@ -30,7 +148,7 @@ function Content() {
   const [statusShowInactiveFilter, setStatusShowInactiveFilter] =
     useState(true);
 
-  const [focusAreasFilter, setFocusAreasFilter] = useState([]);
+  const [selectedFocusAreas, setSelectedFocusAreas] = useState([]);
 
   // load data
   useEffect(() => {
@@ -108,8 +226,8 @@ function Content() {
     });
 
     d3.csv(
-      // REPO_URL + "/data/partnerData.csv"
-      "./data/partnerData.csv"
+      REPO_URL + "/data/partnerData.csv"
+      // "./data/partnerData.csv"
     ).then((data) => {
       // preprocess data as needed
       data.forEach((d) => {
@@ -137,32 +255,35 @@ function Content() {
     }
   }, []);
 
-  // add event listener for checkbox with id "Focus Areas"
+  // listen to change in focus area dropdown
   useEffect(() => {
-    const focusAreasCheckbox = document.getElementById("Focus-Areas");
-    if (focusAreasCheckbox) {
-      const handleFocusAreasChange = (e) => {
-        const value = e.target.value;
-        console.log("Focus Areas filter changed to:", value);
-        setFocusAreasFilter(value);
-      };
-      focusAreasCheckbox.addEventListener("change", handleFocusAreasChange);
-      return () => {
-        focusAreasCheckbox.removeEventListener(
-          "change",
-          handleFocusAreasChange
-        );
-      };
-    }
+    const handleFocusAreasChange = (e) =>
+      setSelectedFocusAreas(e.detail.selectedFocusAreas);
+    document.addEventListener(
+      "dropdown-focus-areas-changed",
+      handleFocusAreasChange
+    );
+    return () => {
+      document.removeEventListener(
+        "dropdown-focus-areas-changed",
+        handleFocusAreasChange
+      );
+    };
   }, []);
 
   // filter places data based on statusInactiveFilter
-  const filteredPlacesData = placesData
+  let filteredPlacesData = placesData
     ? placesData.filter((p) =>
         statusShowInactiveFilter ? true : p["status"] === "Active"
       )
     : null;
-  // TODO: also filter by focusAreasFilter when implemented in Webflow (multi-select)
+
+  // also filter by focus areas if any are selected
+  if (filteredPlacesData && selectedFocusAreas.length > 0) {
+    filteredPlacesData = filteredPlacesData.filter((p) => {
+      return p["focusAreas"].some((area) => selectedFocusAreas.includes(area));
+    });
+  }
 
   return html`
     ${usGeoData
