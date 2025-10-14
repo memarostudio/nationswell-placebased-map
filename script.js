@@ -26,6 +26,9 @@ function Content() {
   const [usGeoData, setUsGeoData] = useState(null);
   const [placesData, setPlacesData] = useState(null);
 
+  const [statusShowInactiveFilter, setStatusShowInactiveFilter] =
+    useState(true);
+
   // load data
   useEffect(() => {
     fetch(REPO_URL + "/data/states-albers-10m.json")
@@ -86,6 +89,8 @@ function Content() {
           d["Partner(s) "] && d["Partner(s) "] !== ""
             ? d["Partner(s) "].split(",").map((p) => p.trim())
             : [];
+
+        d["status"] = d["Status"] && d["Status"] !== "" ? d["Status"] : null;
       });
       data.forEach((d) => {
         d["focusAreaGroups"] =
@@ -100,9 +105,32 @@ function Content() {
     });
   }, []);
 
+  useEffect(() => {
+    // add event listener for checkbox with id "Status"
+    const statusCheckbox = document.getElementById("Status");
+    if (statusCheckbox) {
+      const handleStatusChange = (e) => {
+        const value = e.target.checked;
+        console.log("Status filter changed to:", value);
+        setStatusShowInactiveFilter(value);
+      };
+      statusCheckbox.addEventListener("change", handleStatusChange);
+      return () => {
+        statusCheckbox.removeEventListener("change", handleStatusChange);
+      };
+    }
+  }, []);
+
+  // filter places data based on statusInactiveFilter
+  const filteredPlacesData = placesData
+    ? placesData.filter((p) =>
+        statusShowInactiveFilter ? true : p["status"] === "Active"
+      )
+    : null;
+
   return html`
     ${usGeoData
-      ? html`<${Map} usGeoData=${usGeoData} places=${placesData} />`
+      ? html`<${Map} usGeoData=${usGeoData} places=${filteredPlacesData} />`
       : "Loading..."}
   `;
 }
