@@ -43,11 +43,11 @@ export function FocusAreaGroupLegend() {
     class="absolute top-0 left-0 right-0 bg-[#E9FBAE] flex justify-around px-4 py-2 gap-2"
   >
     ${focusAreasGroups.map((areaGroup) => {
-      return html`<div class="flex items-center space-x-2">
+      return html`<div class="flex items-center gap-2">
         <div class="w-[18px] h-[18px]">
           ${getFocusAreaGroupIcon(areaGroup.label, "#12266B")}
         </div>
-        <span class="text-lg font-libre text-vis-text-primary"
+        <span class="text-lg font-libre text-vis-text-primary italic"
           >${areaGroup.label}</span
         >
       </div>`;

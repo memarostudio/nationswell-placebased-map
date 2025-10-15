@@ -57,7 +57,9 @@ export function Overlay({ place, partners, handleCloseOverlay }) {
         style="background-image: url('${REPO_URL}/assets/gradient_texture_blue_overlay_header.png');"
       >
         <div class="flex flex-col items-start gap-2">
-          <p class="font-libre text-lg font-italic text-vis-text-inverted">
+          <p
+            class="font-libre italic text-lg font-italic text-vis-text-inverted"
+          >
             ${place.startYear}${" "}–${" "}
             ${place.endYear ? place.endYear : "present"}
           </p>
@@ -157,7 +159,7 @@ export function Overlay({ place, partners, handleCloseOverlay }) {
               <div>
                 <span>${place.populationSize}</span>
                 <span
-                  class="block font-libre font-italic text-[14px] leading-[135%] text-vis-text-secondary"
+                  class="block font-libre italic text-[14px] leading-[135%] text-vis-text-secondary"
                   >as of ${place.populationDataYear}</span
                 >
               </div>
@@ -326,12 +328,12 @@ function GiniCoefficientChart({ gini }) {
       : null}
     <div class="flex justify-between w-full mt-2" style="width: ${width}px">
       <p
-        class="font-italic font-libre text-[14px] leading-[135%] text-vis-text-secondary "
+        class="italic font-libre text-[14px] leading-[135%] text-vis-text-secondary "
       >
         complete<br />equality
       </p>
       <p
-        class="font-italic font-libre text-[14px] leading-[135%] text-vis-text-secondary text-right"
+        class="italic font-libre text-[14px] leading-[135%] text-vis-text-secondary text-right"
       >
         complete<br />inequality
       </p>

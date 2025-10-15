@@ -59,7 +59,9 @@ export function MarkerDetails({
     </div>
     <div class="bg-[#F3F0E9] py-4 px-6 flex flex-col items-start">
       <div class="flex flex-row gap-4 items-center">
-        <p class="font-libre text-lg font-italic text-vis-text-secondary">
+        <p
+          class="font-libre text-lg font-italic text-vis-text-secondary italic"
+        >
           ${markerDetails.startYear}${" "}–${" "}
           ${markerDetails.endYear ? markerDetails.endYear : "present"}
         </p>

@@ -317,13 +317,13 @@ export function Map({ usGeoData, places, partners }) {
       class="map-buttons absolute bottom-10 right-4 z-10 flex flex-col space-y-2"
     >
       <button
-        class="map-button border border-solid border-white"
+        class="map-button border border-solid border-white h-[30px] w-[30px]"
         onClick=${handleZoomIn}
       >
         +
       </button>
       <button
-        class="map-button border border-solid border-white"
+        class="map-button border border-solid border-white h-[30px] w-[30px]"
         onClick=${handleZoomOut}
       >
         -
