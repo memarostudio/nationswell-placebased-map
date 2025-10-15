@@ -33,7 +33,7 @@ export function Overlay({ place, partners, handleCloseOverlay }) {
   const titleClasses = "font-sora text-sm uppercase mb-4 font-bold";
   return html`<div class="map-details-overlay fixed inset-0 z-[10001]">
     <div
-      class="map-details-content absolute bg-white rounded-lg shadow-lg top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[11] w-[90%] max-h-[80%] xl:w-[80%] overflow-y-auto"
+      class="map-details-content absolute bg-white rounded-lg shadow-lg top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[11] w-[90%] h-[90%] xl:h-[80%] xl:w-[80%] overflow-y-auto"
     >
       <svg
         class="close-icon absolute top-2 right-2 cursor-pointer h-8 w-8"
@@ -252,6 +252,8 @@ function GiniCoefficientChart({ gini, titleClasses }) {
   const [width, setWidth] = useState(null);
   const [height, setHeight] = useState(null);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [animatedGini, setAnimatedGini] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
 
   // get width and height of the image
   useEffect(() => {
@@ -272,10 +274,62 @@ function GiniCoefficientChart({ gini, titleClasses }) {
     }
   }, []);
 
+  // Intersection Observer for animations
+  useEffect(() => {
+    const giniContainer = document.getElementById("gini-container");
+    if (!giniContainer) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !isVisible) {
+            setIsVisible(true);
+          }
+        });
+      },
+      {
+        threshold: 0.3, // Trigger when 30% of the component is visible
+      }
+    );
+
+    observer.observe(giniContainer);
+
+    return () => {
+      observer.unobserve(giniContainer);
+    };
+  }, [isVisible]);
+
+  // Animate gini value counting up
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const duration = 2000; // 2 seconds
+    const startTime = Date.now();
+    const startValue = 0;
+    const endValue = gini;
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Easing function (ease-out)
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const currentValue = startValue + (endValue - startValue) * easeOut;
+
+      setAnimatedGini(currentValue);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    animate();
+  }, [isVisible, gini]);
+
   // Map gini value (0-1) to angle range:
   const startAngle = Math.PI; // 180° (left)
   const endAngle = 2 * Math.PI; // 360° (right)
-  const angle = startAngle + gini * (endAngle - startAngle);
+  const angle = startAngle + animatedGini * (endAngle - startAngle);
 
   const lineLength = height * 0.625; // Length of the line as 62.5% of the image height
   const centerX = width / 2;
@@ -308,7 +362,7 @@ function GiniCoefficientChart({ gini, titleClasses }) {
         all the income).
       </div>
     </div>
-    <div class="relative">
+    <div class="relative" id="gini-container">
       <img
         src="${REPO_URL}/assets/gini_coefficient_ellipse.png"
         alt="Gini Coefficient Chart"
@@ -329,6 +383,7 @@ function GiniCoefficientChart({ gini, titleClasses }) {
               stroke="#0F100F"
               stroke-width="3"
               stroke-linecap="round"
+              style="transition: all 0.1s ease-out;"
             />
             <g opacity="0">
               <circle cx="${centerX}" cy="${centerY}" r="2" fill="red" />
@@ -343,8 +398,9 @@ function GiniCoefficientChart({ gini, titleClasses }) {
               font-size="14"
               text-anchor="middle"
               class="font-sora font-bold"
+              style="transition: all 0.1s ease-out;"
             >
-              ${(gini * 100).toFixed(0)}%
+              ${(animatedGini * 100).toFixed(0)}%
             </text>
           </svg>`
         : null}
