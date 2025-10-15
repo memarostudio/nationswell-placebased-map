@@ -1,5 +1,6 @@
 import { html, useState } from "./preact-htm.js";
 import { getFocusAreaGroupIcon } from "./focusAreas.js";
+import { REPO_URL } from "./helper.js";
 
 export function FocusAreaDropdown({ focusAreas }) {
   const [selectedAreas, setSelectedAreas] = useState([]);
@@ -18,31 +19,35 @@ export function FocusAreaDropdown({ focusAreas }) {
           const id = area.replace(/\s+/g, "-"); // replace spaces with hyphens for id
           return html`<div
             class="hover:bg-[#2148D1] rounded-md cursor-pointer flex flex-row items-center"
+            onclick=${() => {
+              const isChecked = selectedAreas.includes(area);
+              const newSelectedAreas = isChecked
+                ? selectedAreas.filter((a) => a !== area)
+                : [...selectedAreas, area];
+              setSelectedAreas(newSelectedAreas);
+              document.dispatchEvent(
+                new CustomEvent("dropdown-focus-areas-changed", {
+                  detail: { selectedFocusAreas: newSelectedAreas },
+                })
+              );
+            }}
           >
-            <input
-              type="checkbox"
-              id=${id}
-              name="Focus Areas"
-              value=${area}
-              class="block"
-              style="margin-left: 8px; margin-right: 8px;"
-              checked=${selectedAreas.includes(area)}
-              onchange=${(e) => {
-                const newSelectedAreas = e.target.checked
-                  ? [...selectedAreas, area]
-                  : selectedAreas.filter((a) => a !== area);
-                setSelectedAreas(newSelectedAreas);
-                document.dispatchEvent(
-                  new CustomEvent("dropdown-focus-areas-changed", {
-                    detail: { selectedFocusAreas: newSelectedAreas },
-                  })
-                );
-              }}
-            />
-            <label
-              for=${id}
+            <div class="ml-2 mr-2 w-5 h-5 flex items-center justify-center">
+              ${selectedAreas.includes(area)
+                ? html`<img
+                    src="${REPO_URL}/assets/checkbox_checked.svg"
+                    alt="Checked"
+                    class="w-5 h-5"
+                  />`
+                : html`<img
+                    src="${REPO_URL}/assets/checkbox_unchecked.svg"
+                    alt="Unchecked"
+                    class="w-5 h-5"
+                  />`}
+            </div>
+            <span
               class="inline-block font-authentic text-[14px] leading-[155%] mb-0 p-2 pt-3 grow cursor-pointer"
-              >${area}</label
+              >${area}</span
             >
           </div>`;
         })}

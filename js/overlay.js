@@ -287,8 +287,6 @@ function GiniCoefficientChart({ gini, titleClasses }) {
   const endX = centerX + lineLength * Math.cos(angle);
   const endY = centerY + lineLength * Math.sin(angle);
 
-  console.log("showTooltip:", showTooltip);
-
   return html` <div class="col-span-1 p-6 bg-vis-surface-primary-tonal">
     <div class="flex flex-row gap-1 items-center relative">
       <span class="${titleClasses} text-vis-text-primary">gini coefficient</span
