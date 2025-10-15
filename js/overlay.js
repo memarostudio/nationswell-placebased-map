@@ -170,10 +170,10 @@ export function Overlay({ place, partners, handleCloseOverlay }) {
           class="col-span-1 bg-cover bg-center bg-no-repeat"
           style="background-image: url('${REPO_URL}/assets/areaImages/${areaImageName}'); margin: -2px;"
         ></div>
-        <div class="col-span-1 p-6 bg-vis-surface-primary-tonal">
-          <p class="${titleClasses}  text-vis-text-primary">gini coefficient</p>
-          <${GiniCoefficientChart} gini=${place.gini} />
-        </div>
+        <${GiniCoefficientChart}
+          gini=${place.gini}
+          titleClasses=${titleClasses}
+        />
       </div>
       <div class="grid grid-cols-5">
         <div
@@ -244,13 +244,14 @@ export function Overlay({ place, partners, handleCloseOverlay }) {
   </div>`;
 }
 
-function GiniCoefficientChart({ gini }) {
+function GiniCoefficientChart({ gini, titleClasses }) {
   if (!gini) {
     return html`<p>No Gini Coefficient data available.</p>`;
   }
 
   const [width, setWidth] = useState(null);
   const [height, setHeight] = useState(null);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   // get width and height of the image
   useEffect(() => {
@@ -286,57 +287,81 @@ function GiniCoefficientChart({ gini }) {
   const endX = centerX + lineLength * Math.cos(angle);
   const endY = centerY + lineLength * Math.sin(angle);
 
-  return html`<div class="relative">
-    <img
-      src="${REPO_URL}/assets/gini_coefficient_ellipse.png"
-      alt="Gini Coefficient Chart"
-      id="gini-ellipse"
-    />
-    ${width && height
-      ? html`<svg
-          width="${width}"
-          height="${height}"
-          style="position: absolute; top: 0; left: 0; overflow: visible;"
-        >
-          <rect width="${width}" height="${height}" fill="red" opacity="0" />
-          <line
-            x1="${startX}"
-            y1="${startY}"
-            x2="${endX}"
-            y2="${endY}"
-            stroke="#0F100F"
-            stroke-width="3"
-            stroke-linecap="round"
-          />
-          <g opacity="0">
-            <circle cx="${centerX}" cy="${centerY}" r="2" fill="red" />
-            <circle cx="${startX}" cy="${startY}" r="2" fill="green" />
-            <circle cx="${endX}" cy="${endY}" r="2" fill="blue" />
-          </g>
-          <text
-            x="${centerX}"
-            y="${centerY}"
-            dy="-12"
-            fill="#0f100f"
-            font-size="14"
-            text-anchor="middle"
-            class="font-sora font-bold"
+  console.log("showTooltip:", showTooltip);
+
+  return html` <div class="col-span-1 p-6 bg-vis-surface-primary-tonal">
+    <div class="flex flex-row gap-1 items-center relative">
+      <span class="${titleClasses} text-vis-text-primary">gini coefficient</span
+      ><img
+        src="../assets/question_icon.svg"
+        class="cursor-pointer mb-4"
+        onmouseenter="${() => setShowTooltip(true)}"
+        onmouseleave="${() => setShowTooltip(false)}"
+      />
+      <div
+        class="bg-[#0F100F] px-4 py-2 absolute top-[30px] right-0 font-authentic text-base leading-[155%] text-vis-text-inverted text-transform-none z-10 ${showTooltip
+          ? ""
+          : "hidden"}"
+      >
+        The Gini coefficient measures inequality on a scale ranging from${" "}
+        <span class="font-bold">0%</span>
+        (complete equality: everyone has the same income) to${" "}
+        <span class="font-bold">100%</span> (complete inequality: one person has
+        all the income).
+      </div>
+    </div>
+    <div class="relative">
+      <img
+        src="${REPO_URL}/assets/gini_coefficient_ellipse.png"
+        alt="Gini Coefficient Chart"
+        id="gini-ellipse"
+      />
+      ${width && height
+        ? html`<svg
+            width="${width}"
+            height="${height}"
+            style="position: absolute; top: 0; left: 0; overflow: visible;"
           >
-            ${(gini * 100).toFixed(0)}%
-          </text>
-        </svg>`
-      : null}
-    <div class="flex justify-between w-full mt-2" style="width: ${width}px">
-      <p
-        class="italic font-libre text-[14px] leading-[135%] text-vis-text-secondary "
-      >
-        complete<br />equality
-      </p>
-      <p
-        class="italic font-libre text-[14px] leading-[135%] text-vis-text-secondary text-right"
-      >
-        complete<br />inequality
-      </p>
+            <rect width="${width}" height="${height}" fill="red" opacity="0" />
+            <line
+              x1="${startX}"
+              y1="${startY}"
+              x2="${endX}"
+              y2="${endY}"
+              stroke="#0F100F"
+              stroke-width="3"
+              stroke-linecap="round"
+            />
+            <g opacity="0">
+              <circle cx="${centerX}" cy="${centerY}" r="2" fill="red" />
+              <circle cx="${startX}" cy="${startY}" r="2" fill="green" />
+              <circle cx="${endX}" cy="${endY}" r="2" fill="blue" />
+            </g>
+            <text
+              x="${centerX}"
+              y="${centerY}"
+              dy="-12"
+              fill="#0f100f"
+              font-size="14"
+              text-anchor="middle"
+              class="font-sora font-bold"
+            >
+              ${(gini * 100).toFixed(0)}%
+            </text>
+          </svg>`
+        : null}
+      <div class="flex justify-between w-full mt-2" style="width: ${width}px">
+        <p
+          class="italic font-libre text-[14px] leading-[135%] text-vis-text-secondary "
+        >
+          complete<br />equality
+        </p>
+        <p
+          class="italic font-libre text-[14px] leading-[135%] text-vis-text-secondary text-right"
+        >
+          complete<br />inequality
+        </p>
+      </div>
     </div>
   </div>`;
 }
