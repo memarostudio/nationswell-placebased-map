@@ -10,14 +10,16 @@ import { Overlay } from "./overlay.js";
 import { MarkerDetails } from "./markerDetails.js";
 import { FocusAreaGroupLegend } from "./focusAreas.js";
 
-export function Map({ usGeoData, places, partners }) {
+export function Map({ usGeoData, places, partners, allFocusAreas }) {
   console.log(
     "Rendering Map with usGeoData:",
     usGeoData,
     "and placesData:",
     places,
     "and partnersData:",
-    partners
+    partners,
+    "and allFocusAreas:",
+    allFocusAreas
   );
 
   // map state
@@ -393,11 +395,12 @@ export function Map({ usGeoData, places, partners }) {
         -
       </button>
     </div>
-    <${FocusAreaGroupLegend} />
+    <${FocusAreaGroupLegend} allFocusAreas=${allFocusAreas} />
     ${showOverlay &&
     html`<${Overlay}
       place=${places.filter((p) => p.id === overlayPlaceId)[0]}
       partners=${partners}
+      allFocusAreas=${allFocusAreas}
       handleCloseOverlay=${handleCloseOverlay}
     />`}
   </div> `;

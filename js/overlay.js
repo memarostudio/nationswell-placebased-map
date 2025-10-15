@@ -5,7 +5,12 @@ import {
 } from "./focusAreas.js";
 import { REPO_URL } from "./helper.js";
 
-export function Overlay({ place, partners, handleCloseOverlay }) {
+export function Overlay({
+  place,
+  partners,
+  allFocusAreas,
+  handleCloseOverlay,
+}) {
   if (!place) {
     return null;
   }
@@ -197,7 +202,7 @@ export function Overlay({ place, partners, handleCloseOverlay }) {
                     >
                       <div class="w-[10px] h-[10px]">
                         ${getFocusAreaGroupIcon(
-                          getFocusAreaGroupFromArea(focusArea),
+                          getFocusAreaGroupFromArea(focusArea, allFocusAreas),
                           "#0F100F"
                         )}
                       </div>

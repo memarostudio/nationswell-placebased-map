@@ -159,7 +159,7 @@ function Content({ focusAreas }) {
       data.forEach((d) => {
         d["focusAreaGroups"] =
           d["focusAreas"].length > 0
-            ? getAllFocusAreaGroupsForProject(d["focusAreas"])
+            ? getAllFocusAreaGroupsForProject(d["focusAreas"], focusAreas)
             : [];
       });
 
@@ -234,6 +234,7 @@ function Content({ focusAreas }) {
           usGeoData=${usGeoData}
           places=${filteredPlacesData}
           partners=${partnersData}
+          allFocusAreas=${focusAreas}
         />`
       : "Loading..."}
   `;

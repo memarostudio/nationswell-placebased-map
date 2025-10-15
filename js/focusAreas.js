@@ -1,74 +1,47 @@
 import { html } from "./preact-htm.js";
 
-const focusAreasGroups = [
-  {
-    label: "Arts & Culture",
-    icon: "arts_culture.svg",
-    areas: ["Sports", "Music", "Arts & Culture", "Performance"],
-  },
-  {
-    label: "Capacity Building",
-    icon: "capacity_building.svg",
-    areas: [
-      "Youth Leadership",
-      "Community Leadership",
-      "Skills Training",
-      "Cradle to Career",
-    ],
-  },
-  {
-    label: "Social Systems",
-    icon: "social_systems.svg",
-    areas: ["Care Support Systems", "Social Justice", "Criminal Justice"],
-  },
-  {
-    label: "Economic Development",
-    icon: "economic_development.svg",
-    areas: [
-      "Economic Opportunity",
-      "Retail",
-      "Industry",
-      "Economic Mobility & Generational Wealthbuilding",
-    ],
-  },
-  {
-    label: "Built Environment",
-    icon: "built_environment.svg",
-    areas: ["Housing", "Public Space"],
-  },
-];
+export function FocusAreaGroupLegend({ allFocusAreas }) {
+  const allGroups = groupFocusAreasByGroup(allFocusAreas);
 
-export function FocusAreaGroupLegend() {
   return html`<div
     class="absolute top-0 left-0 right-0 bg-[#E9FBAE] flex justify-around px-4 py-2 gap-2"
   >
-    ${focusAreasGroups.map((areaGroup) => {
+    ${allGroups.map((areaGroup) => {
       return html`<div class="flex items-center gap-2">
         <div class="w-[18px] h-[18px]">
-          ${getFocusAreaGroupIcon(areaGroup.label, "#12266B")}
+          ${getFocusAreaGroupIcon(areaGroup.group, "#12266B")}
         </div>
         <span
           class="text-base xl:text-lg font-libre text-vis-text-primary italic"
-          >${areaGroup.label}</span
+          >${areaGroup.group}</span
         >
       </div>`;
     })}
   </div>`;
 }
 
-export function getFocusAreaGroupFromArea(area) {
-  for (const group of focusAreasGroups) {
+function groupFocusAreasByGroup(allFocusAreas) {
+  const groupedData = d3.group(allFocusAreas, (d) => d["group"]);
+  return Array.from(groupedData, ([group, areas]) => ({
+    group,
+    areas: areas.map((d) => d["area"]),
+  }));
+}
+
+export function getFocusAreaGroupFromArea(area, allFocusAreas) {
+  const allGroups = groupFocusAreasByGroup(allFocusAreas);
+  for (const group of allGroups) {
     if (group.areas.includes(area)) {
-      return group.label;
+      return group.group;
     }
   }
   return null; // or some default value if area not found
 }
 
-export function getAllFocusAreaGroupsForProject(focusAreas) {
+export function getAllFocusAreaGroupsForProject(focusAreas, allFocusAreas) {
   const groups = new Set();
   focusAreas.forEach((area) => {
-    const group = getFocusAreaGroupFromArea(area);
+    const group = getFocusAreaGroupFromArea(area, allFocusAreas);
     if (group) {
       groups.add(group);
     }
@@ -77,8 +50,8 @@ export function getAllFocusAreaGroupsForProject(focusAreas) {
 
   // sort groupsArray based on the order in focusAreasGroups
   groupsArray.sort((a, b) => {
-    const indexA = focusAreasGroups.findIndex((group) => group.label === a);
-    const indexB = focusAreasGroups.findIndex((group) => group.label === b);
+    const indexA = allFocusAreas.findIndex((group) => group.label === a);
+    const indexB = allFocusAreas.findIndex((group) => group.label === b);
     return indexA - indexB;
   });
 
