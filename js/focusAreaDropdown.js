@@ -49,9 +49,7 @@ export function FocusAreaDropdown({ focusAreas }) {
       </div>`;
   });
 
-  return html`<div
-    class="text-vis-text-inverted p-2 w-full h-full overflow-y-auto"
-  >
+  return html`<div class="text-vis-text-inverted p-2 w-full">
     ${groupElements}
   </div>`;
 }

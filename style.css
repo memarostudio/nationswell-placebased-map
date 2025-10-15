@@ -6,5 +6,7 @@
   background: #1131a8;
   width: 311px;
   height: 388px;
+  overflow-y: auto; /* Enable vertical scrolling */
+  overscroll-behavior: contain; /* Prevent Lenis interference */
   display: none; /* Initially hidden */
 }
