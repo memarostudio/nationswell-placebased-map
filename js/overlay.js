@@ -33,7 +33,7 @@ export function Overlay({ place, partners, handleCloseOverlay }) {
   const titleClasses = "font-sora text-sm uppercase mb-4 font-bold";
   return html`<div class="map-details-overlay fixed inset-0 z-[10001]">
     <div
-      class="map-details-content absolute bg-white rounded-lg shadow-lg top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[11] w-[80%] max-h-[80%] overflow-y-auto"
+      class="map-details-content absolute bg-white rounded-lg shadow-lg top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[11] w-[90%] max-h-[80%] xl:w-[80%] overflow-y-auto"
     >
       <svg
         class="close-icon absolute top-2 right-2 cursor-pointer h-8 w-8"

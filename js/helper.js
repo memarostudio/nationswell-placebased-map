@@ -63,3 +63,17 @@ export function latLonToScreen(lat, lon) {
 
 export const REPO_URL =
   "https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main";
+
+// Helper functions for touch gestures
+export function getTouchDistance(touch1, touch2) {
+  const dx = touch1.clientX - touch2.clientX;
+  const dy = touch1.clientY - touch2.clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+export function getTouchCenter(touch1, touch2) {
+  return {
+    x: (touch1.clientX + touch2.clientX) / 2,
+    y: (touch1.clientY + touch2.clientY) / 2,
+  };
+}

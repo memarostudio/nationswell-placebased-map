@@ -47,7 +47,8 @@ export function FocusAreaGroupLegend() {
         <div class="w-[18px] h-[18px]">
           ${getFocusAreaGroupIcon(areaGroup.label, "#12266B")}
         </div>
-        <span class="text-lg font-libre text-vis-text-primary italic"
+        <span
+          class="text-base xl:text-lg font-libre text-vis-text-primary italic"
           >${areaGroup.label}</span
         >
       </div>`;

@@ -1,5 +1,10 @@
 import { html, useState, useRef } from "./preact-htm.js";
-import { stateMapping, latLonToScreen } from "./helper.js";
+import {
+  stateMapping,
+  latLonToScreen,
+  getTouchDistance,
+  getTouchCenter,
+} from "./helper.js";
 import { Marker } from "./marker.js";
 import { Overlay } from "./overlay.js";
 import { MarkerDetails } from "./markerDetails.js";
@@ -20,6 +25,10 @@ export function Map({ usGeoData, places, partners }) {
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isPinching, setIsPinching] = useState(false);
+  const [initialPinchDistance, setInitialPinchDistance] = useState(0);
+  const [initialPinchZoom, setInitialPinchZoom] = useState(1);
+  const [pinchCenter, setPinchCenter] = useState({ x: 0, y: 0 });
   const mapContainerRef = useRef(null);
 
   const [showMarkerDetails, setShowMarkerDetails] = useState(false);
@@ -137,29 +146,81 @@ export function Map({ usGeoData, places, partners }) {
     setIsDragging(false);
   }
 
-  // Touch handlers for mobile
+  // Touch handlers for mobile and tablets
   function handleTouchStart(e) {
+    closeFocusAreaDropdown();
+
     if (e.touches.length === 1) {
+      // Single touch - start panning
+      setIsDragging(true);
+      setDragStart({
+        x: e.touches[0].clientX - pan.x,
+        y: e.touches[0].clientY - pan.y,
+      });
+    } else if (e.touches.length === 2) {
+      // Two touches - start pinching
+      e.preventDefault();
+      setIsDragging(false); // Stop any panning
+      setIsPinching(true);
+
+      const distance = getTouchDistance(e.touches[0], e.touches[1]);
+      const center = getTouchCenter(e.touches[0], e.touches[1]);
+
+      setInitialPinchDistance(distance);
+      setInitialPinchZoom(zoom);
+      setPinchCenter(center);
+    }
+  }
+
+  function handleTouchMove(e) {
+    if (e.touches.length === 1 && isDragging && !isPinching) {
+      // Single touch panning
+      e.preventDefault();
+      setPan({
+        x: e.touches[0].clientX - dragStart.x,
+        y: e.touches[0].clientY - dragStart.y,
+      });
+    } else if (e.touches.length === 2 && isPinching) {
+      // Two touch pinch-to-zoom
+      e.preventDefault();
+
+      const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
+
+      // Calculate zoom based on distance change (with reduced sensitivity)
+      const rawZoomFactor = currentDistance / initialPinchDistance;
+      // Reduce sensitivity by using a dampening factor
+      const zoomFactor = 1 + (rawZoomFactor - 1) * 0.5;
+      const newZoom = Math.min(
+        Math.max(initialPinchZoom * zoomFactor, MIN_ZOOM),
+        MAX_ZOOM
+      );
+
+      // Use the existing zoomToPoint function with the FIXED initial pinch center
+      // This keeps the zoom focal point completely stable
+      zoomToPoint(newZoom, pinchCenter.x, pinchCenter.y);
+
+      // Reset pan when zooming out to minimum
+      if (newZoom === MIN_ZOOM) {
+        setPan({ x: 0, y: 0 });
+        setZoom(MIN_ZOOM);
+      }
+    }
+  }
+
+  function handleTouchEnd(e) {
+    if (e.touches.length === 0) {
+      // All touches ended
+      setIsDragging(false);
+      setIsPinching(false);
+    } else if (e.touches.length === 1 && isPinching) {
+      // Went from two touches to one - switch from pinching to panning
+      setIsPinching(false);
       setIsDragging(true);
       setDragStart({
         x: e.touches[0].clientX - pan.x,
         y: e.touches[0].clientY - pan.y,
       });
     }
-  }
-
-  function handleTouchMove(e) {
-    if (isDragging && e.touches.length === 1) {
-      e.preventDefault();
-      setPan({
-        x: e.touches[0].clientX - dragStart.x,
-        y: e.touches[0].clientY - dragStart.y,
-      });
-    }
-  }
-
-  function handleTouchEnd() {
-    setIsDragging(false);
   }
 
   // Mouse wheel zoom
@@ -185,7 +246,7 @@ export function Map({ usGeoData, places, partners }) {
   const transformStyle = {
     transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
     transformOrigin: "center center",
-    transition: isDragging ? "none" : "transform 0.3s ease-out",
+    transition: isDragging || isPinching ? "none" : "transform 0.3s ease-out",
     cursor: isDragging ? "grabbing" : "grab",
   };
 
@@ -240,8 +301,11 @@ export function Map({ usGeoData, places, partners }) {
     class="position-relative w-full h-full overflow-hidden"
   >
     <div
-      class="map-content relative w-full h-full select-none touch-none"
-      style=${transformStyle}
+      class="map-content relative w-full h-full select-none"
+      style=${{
+        ...transformStyle,
+        touchAction: "none", // Prevent default touch behaviors
+      }}
       onMouseDown=${handleMouseDown}
       onMouseMove=${handleMouseMove}
       onMouseUp=${handleMouseUp}
