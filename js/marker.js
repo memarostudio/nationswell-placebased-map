@@ -1,14 +1,32 @@
 import { html, useState } from "./preact-htm.js";
-import { getFocusAreaGroupIcon } from "./focusAreas.js";
+import {
+  getFocusAreaGroupIcon,
+  getAllFocusAreaGroupsForMultipleProjects,
+} from "./focusAreas.js";
 
-export function Marker({ marker, handleMarkerClick, x, y, zoom = 1, height }) {
+export function Marker({
+  markerGroup,
+  numberOfMarkers,
+  allFocusAreas,
+  handleMarkerClick,
+  x,
+  y,
+  zoom = 1,
+  height,
+}) {
   const [isHovered, setIsHovered] = useState(false);
+
+  // const markerGroupFocusAreas = markerGroup[0].focusAreaGroups; // TODO: adapt to show all focus areas in group
+  const markerGroupFocusAreas = getAllFocusAreaGroupsForMultipleProjects(
+    markerGroup,
+    allFocusAreas
+  );
 
   // Calculate inverse scale to maintain constant size
   const inverseScale = 1 / zoom;
 
   const focusAreaIconPositions = [];
-  switch (marker.focusAreaGroups.length) {
+  switch (markerGroupFocusAreas.length) {
     case 1:
       focusAreaIconPositions.push({ x: 0, y: -20 });
       break;
@@ -42,13 +60,9 @@ export function Marker({ marker, handleMarkerClick, x, y, zoom = 1, height }) {
     <g
       class="marker pointer-events-auto cursor-pointer transition-transform duration-300"
       transform="translate(${x}, ${y}) scale(${inverseScale}) translate(${-x}, ${-y})"
-      onclick=${(event) => handleMarkerClick(event, marker)}
-      onMouseEnter=${() => {
-        setIsHovered(true);
-      }}
-      onMouseLeave=${() => {
-        setIsHovered(false);
-      }}
+      onclick=${(event) => handleMarkerClick(event, markerGroup)}
+      onMouseEnter=${() => setIsHovered(true)}
+      onMouseLeave=${() => setIsHovered(false)}
     >
       <g
         class="marker-default ${isHovered
@@ -62,6 +76,19 @@ export function Marker({ marker, handleMarkerClick, x, y, zoom = 1, height }) {
           class="fill-white"
           style="filter: drop-shadow(0 0 6px rgba(11, 41, 148, 0.79))"
         />
+        ${numberOfMarkers > 1 &&
+        html` <text
+          x=${x}
+          y=${y}
+          dy="1"
+          class="text-black"
+          font-size="14"
+          text-anchor="middle"
+          dominant-baseline="middle"
+          class="font-sora font-bold"
+        >
+          ${numberOfMarkers}
+        </text>`}
       </g>
 
       <g
@@ -79,8 +106,8 @@ export function Marker({ marker, handleMarkerClick, x, y, zoom = 1, height }) {
         />
         <circle cx=${x} cy=${y} r="${14 / 2}" class="fill-white" />
         <g transform="translate(${x - 7}, ${-height / 2 + y})">
-          ${marker.focusAreaGroups.length > 0 &&
-          marker.focusAreaGroups.map((group, index) => {
+          ${markerGroupFocusAreas.length > 0 &&
+          markerGroupFocusAreas.map((group, index) => {
             return html`<g
               transform="translate(${focusAreaIconPositions[index].x +
               1.5}, ${focusAreaIconPositions[index].y})"

@@ -58,6 +58,31 @@ export function getAllFocusAreaGroupsForProject(focusAreas, allFocusAreas) {
   return groupsArray;
 }
 
+export function getAllFocusAreaGroupsForMultipleProjects(
+  projects,
+  allFocusAreas
+) {
+  const groups = new Set();
+  projects.forEach((project) => {
+    project.focusAreas.forEach((area) => {
+      const group = getFocusAreaGroupFromArea(area, allFocusAreas);
+      if (group) {
+        groups.add(group);
+      }
+    });
+  });
+  const groupsArray = Array.from(groups);
+
+  // sort groupsArray based on the order in focusAreasGroups
+  groupsArray.sort((a, b) => {
+    const indexA = allFocusAreas.findIndex((group) => group.label === a);
+    const indexB = allFocusAreas.findIndex((group) => group.label === b);
+    return indexA - indexB;
+  });
+
+  return groupsArray;
+}
+
 export function getFocusAreaGroupIcon(
   focusAreaGroup,
   color = "#12266B",

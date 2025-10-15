@@ -45,8 +45,8 @@ export function Map({ usGeoData, places, partners, allFocusAreas }) {
     return html`<div>Loading Places data...</div>`;
   }
 
+  // state shapes
   const states = topojson.feature(usGeoData, usGeoData.objects.states).features;
-
   const statesArray = states.map((d) => {
     return {
       name: d.properties.name,
@@ -56,6 +56,19 @@ export function Map({ usGeoData, places, partners, allFocusAreas }) {
     };
   });
 
+  // markers - group places by lat and lon to handle same-location cases, group together when markers would overlap
+  const groupedPlaces = {};
+  places
+    .filter((p) => p.lat !== 0 && p.lon !== 0)
+    .forEach((place) => {
+      const key = `${place.lat.toFixed(4)}_${place.lon.toFixed(4)}`; // Group by lat/lon rounded to 4 decimal places, TODO: make clustering zoom dependent
+      if (!groupedPlaces[key]) {
+        groupedPlaces[key] = [];
+      }
+      groupedPlaces[key].push(place);
+    });
+
+  // dimensions
   const width = 975;
   const height = 610;
 
@@ -252,7 +265,7 @@ export function Map({ usGeoData, places, partners, allFocusAreas }) {
     cursor: isDragging ? "grabbing" : "grab",
   };
 
-  function handleMarkerClick(event, marker) {
+  function handleMarkerClick(event, markerGroup) {
     setShowMarkerDetails(true);
 
     const markerRect = event.target.getBoundingClientRect();
@@ -272,7 +285,7 @@ export function Map({ usGeoData, places, partners, allFocusAreas }) {
     }
 
     setMarkerDetails({
-      ...marker,
+      markerGroup,
       x: finalX,
       y: markerRect.top - containerRect.top + 33 - popupHeight / 2,
     });
@@ -356,18 +369,23 @@ export function Map({ usGeoData, places, partners, allFocusAreas }) {
           pointer-events="all"
         />
         <g class="markers-layer">
-          ${places.map((marker) => {
-            const coords = latLonToScreen(marker.lat, marker.lon);
+          ${Object.values(groupedPlaces).map((placesGroup) => {
+            const coords = latLonToScreen(
+              placesGroup[0].lat,
+              placesGroup[0].lon
+            );
             if (!coords) return null; // Skip if outside projection bounds or undefined
 
             const [x, y] = coords;
             return html`<${Marker}
-              marker=${marker}
+              markerGroup=${placesGroup}
               x=${x}
               y=${y}
               zoom=${zoom}
               handleMarkerClick=${handleMarkerClick}
               height=${height}
+              numberOfMarkers=${placesGroup.length}
+              allFocusAreas=${allFocusAreas}
             />`;
           })}
         </g>
