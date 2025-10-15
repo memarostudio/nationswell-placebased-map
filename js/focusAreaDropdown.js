@@ -7,9 +7,9 @@ export function FocusAreaDropdown({ focusAreas }) {
 
   const groupElements = focusAreas.map((group) => {
     return html` <div
-        class="font-libre w-full block border-b border-vis-surface-primary border-solid text-base italic leading-[135%] flex flex-row items-center p-1"
+        class="font-libre w-full block border-b border-vis-surface-primary border-solid text-base italic leading-[135%] flex flex-row items-center p-2"
       >
-        <div class="h-[18px] w-[18px] inline-block align-middle mr-2">
+        <div class="h-[18px] w-[18px] inline-block align-middle mr-[10px]">
           ${getFocusAreaGroupIcon(group.group, "#FBF9F4")}
         </div>
         <span>${group.group}</span>
@@ -32,7 +32,7 @@ export function FocusAreaDropdown({ focusAreas }) {
               );
             }}
           >
-            <div class="ml-2 mr-2 w-5 h-5 flex items-center justify-center">
+            <div class="ml-2 w-5 h-5 flex items-center justify-center shrink-0">
               ${selectedAreas.includes(area)
                 ? html`<img
                     src="${REPO_URL}/assets/checkbox_checked.svg"
@@ -46,7 +46,7 @@ export function FocusAreaDropdown({ focusAreas }) {
                   />`}
             </div>
             <span
-              class="inline-block font-authentic text-[14px] leading-[155%] mb-0 p-2 pt-3 grow cursor-pointer"
+              class="inline-block font-authentic text-[14px] leading-[155%] mb-0 p-2 pt-3 grow cursor-pointer text-balance"
               >${area}</span
             >
           </div>`;
