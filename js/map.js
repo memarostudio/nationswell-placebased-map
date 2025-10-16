@@ -398,16 +398,16 @@ export function Map({ usGeoData, places, partners, allFocusAreas }) {
       handleCloseDetails=${handleCloseDetails}
     />`}
     <div
-      class="map-buttons absolute bottom-10 right-4 z-10 flex flex-col space-y-2"
+      class="map-buttons absolute bottom-12 right-4 z-10 flex flex-col space-y-2"
     >
       <button
-        class="map-button border border-solid border-white h-[30px] w-[30px]"
+        class="map-button border border-solid text-[#2E5AF4] text-xl border-[#2E5AF4] h-[30px] w-[30px] rounded-[50%] bg-[#dfe3f0] hover:bg-[#cdd1e0] transition-colors"
         onClick=${handleZoomIn}
       >
         +
       </button>
       <button
-        class="map-button border border-solid border-white h-[30px] w-[30px]"
+        class="map-button border border-solid text-[#2E5AF4] text-xl border-[#2E5AF4] h-[30px] w-[30px] rounded-[50%] bg-[#dfe3f0] hover:bg-[#cdd1e0] transition-colors"
         onClick=${handleZoomOut}
       >
         -
