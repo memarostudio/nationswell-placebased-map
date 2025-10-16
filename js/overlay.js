@@ -233,7 +233,7 @@ export function Overlay({
                       ><img
                         src="${REPO_URL}/assets/partnerLogos/Partner Name=${partner}.png"
                         alt="${partner} logo"
-                        class="h-12 object-contain"
+                        class="h-12 min-w-12 object-contain"
                     /></a>`;
                   })
                 : null}
