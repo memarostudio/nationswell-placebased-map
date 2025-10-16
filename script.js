@@ -101,7 +101,7 @@ function Content({ focusAreas }) {
 
     d3.csv(
       REPO_URL + "/data/places_with_id.csv"
-      //"./data/places.csv"
+      // "./data/places_with_id.csv"
     ).then((data) => {
       // preprocess data as needed
       data.forEach((d) => {
@@ -167,16 +167,16 @@ function Content({ focusAreas }) {
       // console.log("Loaded places data:", data);
 
       // temporary data fix to create places with same location
-      const projectWithId5 = data.find((d) => d.id === 5);
-      const projectWithId6 = data.find((d) => d.id === 6);
-      const projectWithId7 = data.find((d) => d.id === 8);
+      // const projectWithId5 = data.find((d) => d.id === 5);
+      // const projectWithId6 = data.find((d) => d.id === 6);
+      // const projectWithId7 = data.find((d) => d.id === 8);
 
-      if (projectWithId5 && projectWithId6 && projectWithId7) {
-        projectWithId6.lat = projectWithId5.lat;
-        projectWithId6.lon = projectWithId5.lon;
-        // projectWithId7.lat = projectWithId5.lat;
-        // projectWithId7.lon = projectWithId5.lon;
-      }
+      // if (projectWithId5 && projectWithId6 && projectWithId7) {
+      //   projectWithId6.lat = projectWithId5.lat;
+      //   projectWithId6.lon = projectWithId5.lon;
+      //   // projectWithId7.lat = projectWithId5.lat;
+      //   // projectWithId7.lon = projectWithId5.lon;
+      // }
 
       setPlacesData(data);
     });
