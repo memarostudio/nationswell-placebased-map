@@ -4,6 +4,7 @@ import {
   latLonToScreen,
   getTouchDistance,
   getTouchCenter,
+  REPO_URL,
 } from "./helper.js";
 import { Marker } from "./marker.js";
 import { Overlay } from "./overlay.js";
@@ -339,7 +340,7 @@ export function Map({ usGeoData, places, partners, allFocusAreas }) {
         })}
       </svg>
       <img
-        src="https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main/data/population-density-layer_adjusted1.png"
+        src="${REPO_URL}/data/population-density-layer-6x_adjusted_compressed.png"
         class="map-overlay absolute top-0 left-0 w-full h-full object-contain block pointer-events-none opacity-90 object-contain "
         alt="Population density overlay"
         width="${width}"

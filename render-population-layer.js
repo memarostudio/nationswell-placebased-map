@@ -14,7 +14,7 @@ import fs from "fs";
 import * as d3 from "d3-geo";
 
 // Render at 2x resolution for better quality when zoomed
-const SCALE = 2;
+const SCALE = 8;
 const WIDTH = 975 * SCALE;
 const HEIGHT = 610 * SCALE;
 
@@ -153,9 +153,16 @@ async function renderPopulationLayer() {
 
   // Save as PNG
   const buffer = canvas.toBuffer("image/png");
-  fs.writeFileSync("./data/population-density-layer.png", buffer);
+  fs.writeFileSync(
+    "./data/population-density-layer-" + SCALE + "x.png",
+    buffer
+  );
 
-  console.log("✅ Successfully saved to ./data/population-density-layer.png");
+  console.log(
+    "✅ Successfully saved to ./data/population-density-layer-" +
+      SCALE +
+      "x.png"
+  );
   console.log(`   Resolution: ${WIDTH}x${HEIGHT} (${SCALE}x scale)`);
 }
 
