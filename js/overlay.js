@@ -137,7 +137,9 @@ export function Overlay({
               </svg>
               <span>${place.areaType}</span>
             </div>
-            <div class="flex flex-row space-x-1">
+            ${place.populationSize &&
+            place.populationSize &&
+            html` <div class="flex flex-row space-x-1">
               <svg width="21" height="21" fill="none" viewBox="0 0 21 21">
                 <defs>
                   <clipPath id="a" class="a">
@@ -168,7 +170,7 @@ export function Overlay({
                   >as of ${place.populationDataYear}</span
                 >
               </div>
-            </div>
+            </div>`}
           </div>
         </div>
         <div
