@@ -11,7 +11,7 @@
   display: none; /* Initially hidden */
   box-shadow: 0 8px 24px 6px rgba(0, 0, 0, 0.16);
   backdrop-filter: blur(6px);
-  background-image: url("../assets/gradient_texture_blue_dropdown_bg.png");
+  background-image: url("https://raw.githubusercontent.com/memarostudio/nationswell-placebased-map/refs/heads/main/assets/gradient_texture_blue_dropdown_bg.png");
   background-size: cover;
   background-position: center;
 }
