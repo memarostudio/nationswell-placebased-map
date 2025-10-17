@@ -38,7 +38,7 @@ export function Overlay({
   const titleClasses = "font-sora text-sm uppercase mb-4 font-bold";
   return html`<div class="map-details-overlay fixed inset-0 z-[10001]">
     <div
-      class="map-details-content absolute bg-white rounded-lg shadow-lg top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[11] w-[90%] max-w-[1200px] max-h-[90%] xl:max-h-[80%] xl:w-[80%] overflow-y-auto"
+      class="map-details-content absolute bg-white rounded-lg shadow-lg top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[11] w-[90%] max-w-[1200px] max-h-[90%] xl:max-h-[80%] xl:w-[80%] overflow-y-auto overflow-x-hidden"
       data-lenis-prevent
     >
       <svg
@@ -175,8 +175,10 @@ export function Overlay({
           </div>
         </div>
         <div
-          class="col-span-1 bg-cover bg-center bg-no-repeat"
-          style="background-image: url('${REPO_URL}/assets/areaImages/${areaImageName}'); margin: -2px;"
+          class="${place.gini && place.gini !== 0
+            ? "col-span-1"
+            : "col-span-2"} col-span-1 bg-cover bg-center bg-no-repeat"
+          style="background-image: url('${REPO_URL}/assets/areaImages/${areaImageName}'); margin-right: -3px;"
         ></div>
         <${GiniCoefficientChart}
           gini=${place.gini}
@@ -254,7 +256,7 @@ export function Overlay({
 
 function GiniCoefficientChart({ gini, titleClasses }) {
   if (!gini) {
-    return html`<p>No Gini Coefficient data available.</p>`;
+    return null;
   }
 
   const [width, setWidth] = useState(null);

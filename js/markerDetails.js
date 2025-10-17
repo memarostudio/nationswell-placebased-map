@@ -9,7 +9,7 @@ export function MarkerDetails({
 }) {
   // console.log("Rendering MarkerDetails with:", markerDetails);
   return html`<div
-    className="marker-details absolute bg-white p-6 rounded-xl shadow-lg flex flex-col items-start gap-4 max-w-md "
+    className="marker-details absolute bg-white p-6 rounded-xl shadow-lg flex flex-col items-start gap-4 max-w-md z-[101]"
     style="top: ${markerDetails ? markerDetails.y : 0}px; left: ${markerDetails
       ? markerDetails.x
       : 0}px;"
