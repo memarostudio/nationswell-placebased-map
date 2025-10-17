@@ -62,7 +62,7 @@ export function Overlay({
         class="flex flex-row items-end justify-between bg-blue-600 px-6 pt-[33px] pb-6 bg-cover bg-center"
         style="background-image: url('${REPO_URL}/assets/gradient_texture_blue_overlay_header.png');"
       >
-        <div class="flex flex-col items-start gap-2">
+        <div class="flex flex-col items-start">
           <p
             class="font-libre italic text-lg font-italic text-vis-text-inverted"
           >
@@ -353,7 +353,7 @@ function GiniCoefficientChart({ gini, titleClasses }) {
     <div class="flex flex-row gap-1 items-center relative">
       <span class="${titleClasses} text-vis-text-primary">gini coefficient</span
       ><img
-        src="../assets/question_icon.svg"
+        src="${REPO_URL}/assets/question_icon.svg"
         class="cursor-pointer mb-4"
         onmouseenter="${() => setShowTooltip(true)}"
         onmouseleave="${() => setShowTooltip(false)}"
