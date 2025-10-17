@@ -108,14 +108,13 @@ function renderFocusAreasDropdown(focusAreas, placesData) {
   if (triggerElement) {
     const triggerRightX = triggerElement.getBoundingClientRect().right;
     const triggerY = triggerElement.getBoundingClientRect().top;
-    const navOffset = 104;
 
     triggerElement.addEventListener("click", () => {
       const containerElement = document.getElementById(
         "focus-areas-dropdown-container"
       );
       if (containerElement) {
-        containerElement.style.top = `${triggerY - navOffset}px`;
+        containerElement.style.top = `${triggerY}px`;
         containerElement.style.left = `${triggerRightX + 10}px`;
         if (containerElement.style.display !== "block") {
           containerElement.style.display = "block";
