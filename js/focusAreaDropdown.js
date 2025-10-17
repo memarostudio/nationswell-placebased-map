@@ -2,7 +2,7 @@ import { html, useState } from "./preact-htm.js";
 import { getFocusAreaGroupIcon } from "./focusAreas.js";
 import { REPO_URL } from "./helper.js";
 
-export function FocusAreaDropdown({ focusAreas }) {
+export function FocusAreaDropdown({ focusAreas, placesData }) {
   const [selectedAreas, setSelectedAreas] = useState([]);
 
   const groupElements = focusAreas.map((group) => {
@@ -16,10 +16,17 @@ export function FocusAreaDropdown({ focusAreas }) {
       </div>
       <div class="mb-2">
         ${group.areas.map((area) => {
-          const id = area.replace(/\s+/g, "-"); // replace spaces with hyphens for id
+          // find out if any places are associated with this focus area
+          const areaHasPlaces = placesData.some((place) => {
+            return place.focusAreas.includes(area);
+          });
+
           return html`<div
-            class="hover:bg-[#2148D1] rounded-md cursor-pointer flex flex-row items-center"
+            class="rounded-md  flex flex-row items-center ${areaHasPlaces
+              ? "hover:bg-[#2148D1] cursor-pointer"
+              : "opacity-40 cursor-not-allowed"}"
             onclick=${() => {
+              if (!areaHasPlaces) return;
               const isChecked = selectedAreas.includes(area);
               const newSelectedAreas = isChecked
                 ? selectedAreas.filter((a) => a !== area)
@@ -46,7 +53,9 @@ export function FocusAreaDropdown({ focusAreas }) {
                   />`}
             </div>
             <span
-              class="inline-block font-authentic text-[14px] leading-[155%] mb-0 p-2 pt-3 grow cursor-pointer text-balance"
+              class="inline-block font-authentic text-[14px] leading-[155%] mb-0 p-2 pt-3 grow ${areaHasPlaces
+                ? "cursor-pointer"
+                : "cursor-not-allowed"} text-balance"
               >${area}</span
             >
           </div>`;

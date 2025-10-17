@@ -8,33 +8,99 @@ console.log("Script for place-based map loaded.");
 main();
 
 function main() {
-  // fetch focus area data
-  d3.csv(
-    REPO_URL + "/data/focusAreasData.csv"
-    // "./data/focusAreasData.csv"
-  ).then((data) => {
+  Promise.all([
+    d3.csv(
+      REPO_URL + "/data/focusAreasData.csv"
+      // "./data/focusAreasData.csv"
+    ),
+    d3.csv(
+      REPO_URL + "/data/places_with_id.csv"
+      // "./data/places_with_id.csv"
+    ),
+  ]).then(([focusAreaData, placesData]) => {
     // process focus area data
-    data.forEach((d) => {
+    focusAreaData.forEach((d) => {
       d["group"] = d["Focus Area Category"];
       d["area"] = d["Focus Area"];
     });
 
     // group focus area data by focus group
-    const groupedData = d3.group(data, (d) => d["group"]);
+    const groupedData = d3.group(focusAreaData, (d) => d["group"]);
     const groupedDataArray = Array.from(groupedData, ([group, areas]) => ({
       group,
       areas: areas.map((d) => d["area"]),
     }));
 
+    // preprocess places data as needed
+    placesData.forEach((d) => {
+      d["approved"] =
+        d["Approval?"] && d["Approval?"].trim() === "Approved" ? true : false;
+      d["id"] = +d["Id"];
+      d["lat"] = +d["Latitude"];
+      d["lon"] = +d["Longitude"];
+      d["gini"] = +d["Gini Coefficient"];
+      d["name"] = d["Project Name"];
+      d["startYear"] =
+        d["Start Year"] && d["Start Year"] !== "" ? d["Start Year"] : "20xx";
+      d["endYear"] = d["End Year"];
+      d["previewDescription"] =
+        d["Project Preview Description"] &&
+        d["Project Preview Description"] !== ""
+          ? d["Project Preview Description"]
+          : "Placeholder MPN functions as both a network catalyst and a collaborative architect, enabling funders to come together, learn together, and act together. ";
+      d["description"] =
+        d["Project Description"] && d["Project Description"] !== ""
+          ? d["Project Description"]
+          : "No description available.";
+      d["highlight"] =
+        d["Key Highlight"] && d["Key Highlight"] !== ""
+          ? d["Key Highlight"]
+          : "No key highlight available.";
+      d["city"] = d["City"];
+      d["state"] = d["State"];
+      d["focusAreas"] =
+        d["Focus Area(s) (Dropdown)"] && d["Focus Area(s) (Dropdown)"] !== ""
+          ? d["Focus Area(s) (Dropdown)"].split(",").map((f) => f.trim())
+          : [];
+      d["areaType"] =
+        d["Area Type"] && d["Area Type"] !== "" ? d["Area Type"] : null;
+
+      d["populationSize"] =
+        d["Population Size (City)"] && d["Population Size (City)"] !== ""
+          ? d["Population Size (City)"]
+          : null;
+      d["populationDataYear"] =
+        d["Population Data Year"] && d["Population Data Year"] !== ""
+          ? d["Population Data Year"]
+          : null;
+      d["projectLink"] =
+        d["Project Link (URL)"] && d["Project Link (URL)"] !== ""
+          ? d["Project Link (URL)"]
+          : null;
+      d["partners"] =
+        d["Partner(s) "] && d["Partner(s) "] !== ""
+          ? d["Partner(s) "].split(",").map((p) => p.trim())
+          : [];
+
+      d["status"] = d["Status"] && d["Status"] !== "" ? d["Status"] : null;
+    });
+    placesData.forEach((d) => {
+      d["focusAreaGroups"] =
+        d["focusAreas"].length > 0
+          ? getAllFocusAreaGroupsForProject(d["focusAreas"], focusAreaData)
+          : [];
+    });
+    placesData = placesData.filter((p) => p["name"] !== "" && p["approved"]);
+
     // render focus areas dropdown within Webflow container
-    renderFocusAreasDropdown(groupedDataArray);
+    renderFocusAreasDropdown(groupedDataArray, placesData);
 
     // render main content
-    renderContent(data);
+    renderContent(focusAreaData, placesData);
   });
 }
 
-function renderFocusAreasDropdown(focusAreas) {
+function renderFocusAreasDropdown(focusAreas, placesData) {
   // get trigger element and add event listener to toggle visibility of container
   const triggerElement = document.getElementById(
     "focus-areas-dropdown-trigger"
@@ -58,7 +124,10 @@ function renderFocusAreasDropdown(focusAreas) {
         }
 
         renderComponent(
-          html`<${FocusAreaDropdown} focusAreas=${focusAreas} />`,
+          html`<${FocusAreaDropdown}
+            focusAreas=${focusAreas}
+            placesData=${placesData}
+          />`,
           containerElement
         );
       }
@@ -66,7 +135,7 @@ function renderFocusAreasDropdown(focusAreas) {
   }
 }
 
-function renderContent(focusAreas) {
+function renderContent(focusAreas, placesData) {
   const containerElement = document.getElementById("map");
   if (containerElement) {
     // clear existing content before rendering
@@ -75,7 +144,7 @@ function renderContent(focusAreas) {
     // wait for async Vis to resolve before rendering
     (async () => {
       renderComponent(
-        html`<${Content} focusAreas=${focusAreas} />`,
+        html`<${Content} focusAreas=${focusAreas} placesData=${placesData} />`,
         containerElement
       );
     })();
@@ -84,9 +153,9 @@ function renderContent(focusAreas) {
   }
 }
 
-function Content({ focusAreas }) {
+function Content({ focusAreas, placesData }) {
   const [usGeoData, setUsGeoData] = useState(null);
-  const [placesData, setPlacesData] = useState(null);
+  // const [placesData, setPlacesData] = useState(null);
   const [partnersData, setPartnersData] = useState(null);
 
   const [statusShowInactiveFilter, setStatusShowInactiveFilter] =
@@ -99,88 +168,6 @@ function Content({ focusAreas }) {
     fetch(REPO_URL + "/data/states-albers-10m.json")
       .then((res) => res.json())
       .then(setUsGeoData);
-
-    d3.csv(
-      REPO_URL + "/data/places_with_id.csv"
-      // "./data/places_with_id.csv"
-    ).then((data) => {
-      // preprocess data as needed
-      data.forEach((d) => {
-        d["approved"] =
-          d["Approval?"] && d["Approval?"].trim() === "Approved" ? true : false;
-        d["id"] = +d["Id"];
-        d["lat"] = +d["Latitude"];
-        d["lon"] = +d["Longitude"];
-        d["gini"] = +d["Gini Coefficient"];
-        d["name"] = d["Project Name"];
-        d["startYear"] =
-          d["Start Year"] && d["Start Year"] !== "" ? d["Start Year"] : "20xx";
-        d["endYear"] = d["End Year"];
-        d["previewDescription"] =
-          d["Project Preview Description"] &&
-          d["Project Preview Description"] !== ""
-            ? d["Project Preview Description"]
-            : "Placeholder MPN functions as both a network catalyst and a collaborative architect, enabling funders to come together, learn together, and act together. ";
-        d["description"] =
-          d["Project Description"] && d["Project Description"] !== ""
-            ? d["Project Description"]
-            : "No description available.";
-        d["highlight"] =
-          d["Key Highlight"] && d["Key Highlight"] !== ""
-            ? d["Key Highlight"]
-            : "No key highlight available.";
-        d["city"] = d["City"];
-        d["state"] = d["State"];
-        d["focusAreas"] =
-          d["Focus Area(s) (Dropdown)"] && d["Focus Area(s) (Dropdown)"] !== ""
-            ? d["Focus Area(s) (Dropdown)"].split(",").map((f) => f.trim())
-            : [];
-        d["areaType"] =
-          d["Area Type"] && d["Area Type"] !== "" ? d["Area Type"] : null;
-
-        d["populationSize"] =
-          d["Population Size (City)"] && d["Population Size (City)"] !== ""
-            ? d["Population Size (City)"]
-            : null;
-        d["populationDataYear"] =
-          d["Population Data Year"] && d["Population Data Year"] !== ""
-            ? d["Population Data Year"]
-            : null;
-        d["projectLink"] =
-          d["Project Link (URL)"] && d["Project Link (URL)"] !== ""
-            ? d["Project Link (URL)"]
-            : null;
-        d["partners"] =
-          d["Partner(s) "] && d["Partner(s) "] !== ""
-            ? d["Partner(s) "].split(",").map((p) => p.trim())
-            : [];
-
-        d["status"] = d["Status"] && d["Status"] !== "" ? d["Status"] : null;
-      });
-      data.forEach((d) => {
-        d["focusAreaGroups"] =
-          d["focusAreas"].length > 0
-            ? getAllFocusAreaGroupsForProject(d["focusAreas"], focusAreas)
-            : [];
-      });
-
-      data = data.filter((p) => p["name"] !== "" && p["approved"]);
-      // console.log("Loaded places data:", data);
-
-      // temporary data fix to create places with same location
-      // const projectWithId5 = data.find((d) => d.id === 5);
-      // const projectWithId6 = data.find((d) => d.id === 6);
-      // const projectWithId7 = data.find((d) => d.id === 8);
-
-      // if (projectWithId5 && projectWithId6 && projectWithId7) {
-      //   projectWithId6.lat = projectWithId5.lat;
-      //   projectWithId6.lon = projectWithId5.lon;
-      //   // projectWithId7.lat = projectWithId5.lat;
-      //   // projectWithId7.lon = projectWithId5.lon;
-      // }
-
-      setPlacesData(data);
-    });
 
     d3.csv(
       REPO_URL + "/data/partnerData.csv"
@@ -200,11 +187,8 @@ function Content({ focusAreas }) {
   useEffect(() => {
     const statusCheckbox = document.getElementById("Status");
     if (statusCheckbox) {
-      const handleStatusChange = (e) => {
-        const value = e.target.checked;
-        console.log("Status filter changed to:", value);
-        setStatusShowInactiveFilter(value);
-      };
+      const handleStatusChange = (e) =>
+        setStatusShowInactiveFilter(e.target.checked);
       statusCheckbox.addEventListener("change", handleStatusChange);
       return () => {
         statusCheckbox.removeEventListener("change", handleStatusChange);
