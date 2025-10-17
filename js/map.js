@@ -266,29 +266,89 @@ export function Map({ usGeoData, places, partners, allFocusAreas }) {
     cursor: isDragging ? "grabbing" : "grab",
   };
 
-  function handleMarkerClick(event, markerGroup) {
-    setShowMarkerDetails(true);
+  // Helper function to calculate screen position from map coordinates
+  function getScreenPosition(mapX, mapY) {
+    if (!mapContainerRef.current) return { x: 0, y: 0 };
 
-    const markerRect = event.target.getBoundingClientRect();
     const containerRect = mapContainerRef.current.getBoundingClientRect();
 
-    const markerCenterX =
-      markerRect.left - containerRect.left + markerRect.width / 2;
+    // The SVG has a viewBox of "0 0 975 610" and is styled with object-contain
+    // We need to calculate how the SVG maps to the actual container
+    const svgAspectRatio = width / height; // 975 / 610
+    const containerAspectRatio = containerRect.width / containerRect.height;
+
+    let svgWidth, svgHeight, svgOffsetX, svgOffsetY;
+
+    if (containerAspectRatio > svgAspectRatio) {
+      // Container is wider - SVG will be constrained by height
+      svgHeight = containerRect.height;
+      svgWidth = svgHeight * svgAspectRatio;
+      svgOffsetX = (containerRect.width - svgWidth) / 2;
+      svgOffsetY = 0;
+    } else {
+      // Container is taller - SVG will be constrained by width
+      svgWidth = containerRect.width;
+      svgHeight = svgWidth / svgAspectRatio;
+      svgOffsetX = 0;
+      svgOffsetY = (containerRect.height - svgHeight) / 2;
+    }
+
+    // Convert SVG coordinates to container-relative coordinates
+    const relativeX = (mapX / width) * svgWidth + svgOffsetX;
+    const relativeY = (mapY / height) * svgHeight + svgOffsetY;
+
+    // Apply the current transform (zoom and pan)
+    const centerX = containerRect.width / 2;
+    const centerY = containerRect.height / 2;
+
+    const screenX = centerX + (relativeX - centerX) * zoom + pan.x;
+    const screenY = centerY + (relativeY - centerY) * zoom + pan.y;
+
+    return { x: screenX, y: screenY };
+  } // Calculate marker details position dynamically
+  function getMarkerDetailsPosition() {
+    if (!markerDetails || !mapContainerRef.current) return { x: 0, y: 0 };
+
+    const screenPos = getScreenPosition(markerDetails.mapX, markerDetails.mapY);
+    const containerRect = mapContainerRef.current.getBoundingClientRect();
 
     const popupWidth = 448;
     const popupHeight = 318;
 
-    const offsetX = markerCenterX + 33 + 9;
+    // Calculate the actual marker radius in screen pixels
+    // The marker has a radius of 12 in SVG coordinates, but it's scaled by the inverse of zoom
+    // and then the whole SVG is scaled again, so effectively the marker stays constant size
+    const markerRadius = 33; // Base marker radius in pixels
+    const spacing = 9; // Spacing between marker and popup
+    const markerOffset = markerRadius + spacing;
 
-    let finalX = offsetX;
-    if (offsetX + popupWidth > containerRect.width) {
-      finalX = markerCenterX - popupWidth - 33 - 9;
+    // Try to position popup to the right of the marker
+    let finalX = screenPos.x + markerOffset;
+
+    // If popup would go off the right edge, position it to the left
+    if (finalX + popupWidth > containerRect.width) {
+      finalX = screenPos.x - popupWidth - markerOffset;
     }
+
+    // Center popup vertically relative to marker
+    const finalY = screenPos.y - popupHeight / 2;
+
+    return { x: finalX, y: finalY };
+  }
+
+  function handleMarkerClick(event, markerGroup) {
+    setShowMarkerDetails(true);
+
+    // Store the marker's position in map coordinates (not screen coordinates)
+    const coords = latLonToScreen(markerGroup[0].lat, markerGroup[0].lon);
+    if (!coords) return;
+
+    const [mapX, mapY] = coords;
 
     setMarkerDetails({
       markerGroup,
-      x: finalX,
-      y: markerRect.top - containerRect.top + 33 - popupHeight / 2,
+      mapX, // Store map coordinates instead of screen coordinates
+      mapY,
     });
   }
 
@@ -395,6 +455,7 @@ export function Map({ usGeoData, places, partners, allFocusAreas }) {
     ${showMarkerDetails &&
     html`<${MarkerDetails}
       markerDetails=${markerDetails}
+      position=${getMarkerDetailsPosition()}
       viewProjectDetails=${viewProjectDetails}
       handleCloseDetails=${handleCloseDetails}
     />`}

@@ -4,14 +4,15 @@ import { getFocusAreaGroupIcon } from "./focusAreas.js";
 
 export function MarkerDetails({
   markerDetails,
+  position,
   viewProjectDetails,
   handleCloseDetails,
 }) {
   // console.log("Rendering MarkerDetails with:", markerDetails);
   return html`<div
     className="marker-details absolute bg-white p-6 rounded-xl shadow-lg flex flex-col items-start gap-4 max-w-md z-[101]"
-    style="top: ${markerDetails ? markerDetails.y : 0}px; left: ${markerDetails
-      ? markerDetails.x
+    style="top: ${position ? position.y : 0}px; left: ${position
+      ? position.x
       : 0}px;"
   >
     <svg
